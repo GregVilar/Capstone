@@ -1,41 +1,27 @@
-import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import Login from "./App/Login";
-
-SplashScreen.preventAutoHideAsync();
+import MainNavigator from "./App/MainNavigator"; // Import MainNavigator
 
 export default function App() {
-  const [loaded] = useFonts({
-    "outfit-semi": require("./assets/fonts/Outfit-SemiBold.ttf"),
-    "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"),
+  const [fontsLoaded] = useFonts({
+    "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"), // Ensure path is correct
   });
 
-  useEffect(() => {
-    if (loaded) {
+  React.useEffect(() => {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded]);
 
-  if (!loaded) {
-    return null;
+  if (!fontsLoaded) {
+    return null; // Optionally show a loading screen here
   }
 
   return (
-    <View style={styles.container}>
-      <Login />
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <MainNavigator />
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
