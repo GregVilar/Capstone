@@ -1,28 +1,115 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { NavigationContainer, DrawerActions } from '@react-navigation/native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { auth } from './FirebaseConfig'; // Adjust path if needed
+import Home from './Home';
+import Favorites from './Favorites';
+import Forum from './Forum';
+import Translate from './Translate';
+import TTS from './TTS';
+import Help from './Help';
 
-const AuthenticatedScreen = ({ navigation }) => {
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      console.log("User logged out successfully!");
-      navigation.navigate("Login"); // Navigate to Login screen after logout
-    } catch (error) {
-      console.error("Logout error:", error.message);
-    }
-  };
+// Home Screen - LOGOUT FUNCTION WIP - ADD TO DRAWER MENU
+// const HomeScreen = ({ navigation }) => {
+//   const handleLogout = async () => {
+//     try {
+//       await auth.signOut();
+//       console.log("User logged out successfully!");
+//       navigation.navigate("Login"); // Navigate to Login screen after logout
+//     } catch (error) {
+//       console.error("Logout error:", error.message);
+//     }
+//   };
 
-  const user = auth.currentUser;
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.title}>Welcome</Text>
+//       <Button title="Logout" onPress={handleLogout} color="#e74c3c" />
+//     </View>
+//   );
+// };
 
+// Settings Screen
+const SettingsScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome</Text>
-      <Text style={styles.emailText}>{user ? user.email : "No user found"}</Text>
-      <Button title="Logout" onPress={handleLogout} color="#e74c3c" />
+      <Text style={styles.title}>Settings</Text>
     </View>
   );
 };
+
+const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
+function BottomTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === 'Home') {
+            iconName = 'home-circle';
+          } else if (route.name === 'Forum') {
+            iconName = 'forum';
+          } else if (route.name === 'Favorite') {
+            iconName = 'heart';
+          }
+
+          return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#FF5757', // Color for the active tab
+        tabBarInactiveTintColor: 'gray', // Color for the inactive tabs
+        tabBarStyle: { backgroundColor: '#185c6b' }, // Background color of the tab bar
+        tabBarLabelStyle: { fontFamily: 'outfit-bold', fontSize: 11 } // Custom font for labels
+      })}
+    >
+      <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
+      <Tab.Screen name="Forum" component={Forum} options={{ headerShown: false }} />
+      <Tab.Screen name="Favorite" component={Favorites} options={{ headerShown: false }}  />
+    </Tab.Navigator>
+  );
+}
+
+export default function AuthenticatedScreen() {
+  return (
+    <NavigationContainer independent={true}>
+      <Drawer.Navigator
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        screenOptions={({ navigation }) => ({
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+              <MaterialCommunityIcons name="menu" size={24} color="white" style={{ marginLeft: 16 }} />
+            </TouchableOpacity>
+          ),
+          headerStyle: {
+            backgroundColor: '#185c6b',
+          },
+          headerTintColor: '#fff',
+        })}
+      >
+        <Drawer.Screen name="PWDaan" component={BottomTabs} />
+        <Drawer.Screen name="TTS" component={TTS} />
+        <Drawer.Screen name="Translate" component={Translate} />
+        <Drawer.Screen name="Help" component={Help} />
+        <Drawer.Screen name="Settings" component={SettingsScreen} />
+      </Drawer.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// Custom Drawer Content Component
+const CustomDrawerContent = (props) => (
+  <DrawerContentScrollView {...props}>
+    <View style={styles.drawerContent}>
+      <Text style={styles.drawerTitle}>Menu</Text>
+      <DrawerItemList {...props} />
+    </View>
+  </DrawerContentScrollView>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -37,11 +124,12 @@ const styles = StyleSheet.create({
     fontFamily: 'outfit-bold',
     marginBottom: 16,
   },
-  emailText: {
-    fontSize: 18,
-    fontFamily: 'outfit-bold',
-    marginBottom: 20,
+  drawerContent: {
+    flex: 1,
+    padding: 16,
+  },
+  drawerTitle: {
+    fontSize: 24,
+    marginBottom: 16,
   },
 });
-
-export default AuthenticatedScreen;

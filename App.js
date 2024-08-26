@@ -6,7 +6,9 @@ import MainNavigator from "./App/MainNavigator"; // Import MainNavigator
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"), // Ensure path is correct
+    "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"),
+    "outfit-regular": require("./assets/fonts/Outfit-Regular.ttf"),
+          
   });
 
   React.useEffect(() => {

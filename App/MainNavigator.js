@@ -21,7 +21,7 @@ function MainNavigator() {
     <Stack.Navigator>
       <Stack.Screen name="Login" component={Login} />
       {user && (
-        <Stack.Screen name="AuthenticatedScreen" component={AuthenticatedScreen} />
+        <Stack.Screen name="AuthenticatedScreen" component={AuthenticatedScreen} options={{ headerShown: false }} />
       )}
     </Stack.Navigator>
   );
