@@ -10,7 +10,7 @@ import Favorites from './Favorites';
 import Forum from './Forum';
 import Translate from './Translate';
 import TTS from './TTS';
-import Help from './Help';
+import HelpStack from "./HelpStack";
 
 // Home Screen - LOGOUT FUNCTION WIP - ADD TO DRAWER MENU
 // const HomeScreen = ({ navigation }) => {
@@ -94,7 +94,7 @@ export default function AuthenticatedScreen() {
         <Drawer.Screen name="PWDaan" component={BottomTabs} />
         <Drawer.Screen name="TTS" component={TTS} />
         <Drawer.Screen name="Translate" component={Translate} />
-        <Drawer.Screen name="Help" component={Help} />
+        <Drawer.Screen name="Help" component={HelpStack} />
         <Drawer.Screen name="Settings" component={SettingsScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
