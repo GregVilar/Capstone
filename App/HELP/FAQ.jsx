@@ -2,19 +2,6 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-  //   return (
-  //     <View style={styles.container}>
-  //       <Text style={styles.title}>Frequently Asked Questions</Text>
-  //       <Text style={styles.content}>
-  //         {/* Add your FAQ content here */}
-  //         1. What is this app about?
-  //         {'\n'}2. How do I use this feature?
-  //         {'\n'}3. How can I contact support?
-  //       </Text>
-  //     </View>
-  //   );
-  // };
-
   const FAQ = () => {
     const navigation = useNavigation();
 
@@ -99,7 +86,7 @@ import { useNavigation } from '@react-navigation/native';
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#185c6b',
-      padding: 20,
+      padding: 10,
       borderBottomLeftRadius: 30,
       borderBottomRightRadius: 30,
       zIndex: 2, // Ensure this container is above the image
@@ -120,7 +107,7 @@ import { useNavigation } from '@react-navigation/native';
     },
     image: {
       width: '100%',
-      height: 200, // Adjust as needed
+      height: 220, // Adjust as needed
       position: 'absolute',
       bottom: 460, // Ensure image is positioned at the bottom
       zIndex: 1, // Ensure image is below the main container

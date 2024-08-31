@@ -7,7 +7,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { auth } from './FirebaseConfig'; // Adjust path if needed
 import Home from './Home';
 import Favorites from './Favorites';
-import Forum from './Forum';
+import ForumStack from './ForumStack';
 import Translate from './Translate';
 import TTS from './TTS';
 import HelpStack from "./HelpStack";
@@ -68,7 +68,7 @@ function BottomTabs() {
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Forum" component={Forum} options={{ headerShown: false }} />
+      <Tab.Screen name="Forum" component={ForumStack} options={{ headerShown: false }} />
       <Tab.Screen name="Favorite" component={Favorites} options={{ headerShown: false }}  />
     </Tab.Navigator>
   );

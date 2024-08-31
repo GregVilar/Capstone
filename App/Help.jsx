@@ -29,10 +29,38 @@ const AdditionalContainer = ({ navigation }) => (
   <View style={styles.additionalContainer}>
     <Text style={styles.additionalText}>Help Portal</Text>
     <TouchableOpacity
-      style={styles.faqButton}
+      style={styles.navButton}
       onPress={() => navigation.navigate('FAQScreen')}
     >
-      <Text style={styles.faqButtonText}>Go to FAQ</Text>
+      <Text style={styles.navButtonText}>Go to FAQ</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.navButton2}
+      onPress={() => navigation.navigate('AddInfo')}
+    >
+      <Text style={styles.navButtonText}>Additional Info</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.navButton3}
+      onPress={() => navigation.navigate('Hotline')}
+    >
+      <Text style={styles.navButtonText}>Hotline</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.navButton4}
+      onPress={() => navigation.navigate('LARG')}
+    >
+      <Text style={styles.navButtonText}>Rating Guide</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.navButton5}
+      onPress={() => navigation.navigate('LARG3')}
+    >
+      <Text style={styles.navButtonText}>Photo Guide</Text>
     </TouchableOpacity>
   </View>
 );
@@ -47,7 +75,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#185c6b',
-    padding: 20,
+    padding: 10,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     zIndex: 2, // Ensure this container is above the image
@@ -68,7 +96,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200, // Adjust as needed
+    height: 220, // Adjust as needed
     position: 'absolute',
     bottom: 460, // Ensure image is positioned at the bottom
     zIndex: 1, // Ensure image is below the main container
@@ -77,8 +105,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FF5757',
-    paddingBottom: 400,
-    borderRadius: 10,
+    paddingBottom: 100,
+    borderRadius: 30,
     position: 'absolute', 
     bottom: 0, 
     left: 0, 
@@ -91,17 +119,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  faqButton: {
+  navButton: {
     marginTop: 10,
     backgroundColor: '#fff',
-    paddingVertical: 10,
+    paddingVertical: 20,
     paddingHorizontal: 140,
     borderRadius: 5,
   },
-  faqButtonText: {
+  navButtonText: {
     color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  navButton2: {
+    marginTop: 10,
+    backgroundColor: '#fff',
+    paddingVertical: 20,
+    borderRadius: 5,
+    paddingHorizontal: 122,
+  },
+  navButton3: {
+    marginTop: 10,
+    backgroundColor: '#fff',
+    paddingVertical: 20,
+    borderRadius: 5,
+    paddingHorizontal: 150,
+  },
+  navButton4: {
+    marginTop: 10,
+    backgroundColor: '#fff',
+    paddingVertical: 20,
+    borderRadius: 5,
+    paddingHorizontal: 127,
+  },
+  navButton5: {
+    marginTop: 10,
+    backgroundColor: '#fff',
+    paddingVertical: 20,
+    borderRadius: 5,
+    paddingHorizontal: 127,
   },
 });
 
