@@ -1,6 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./Login";
+import SignUp from "./SignUp";
 import AuthenticatedScreen from "./AuthenticatedScreen";
 import { auth } from "./FirebaseConfig"; // Adjust path if needed
 
@@ -20,6 +21,7 @@ function MainNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="SignUp" component={SignUp} />
       {user && (
         <Stack.Screen name="AuthenticatedScreen" component={AuthenticatedScreen} options={{ headerShown: false }} />
       )}

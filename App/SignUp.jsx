@@ -1,29 +1,40 @@
 import React, { useState, useCallback } from "react";
 import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { auth, signInWithEmailAndPassword } from "./FirebaseConfig"; // Adjust the path
+import { auth, createUserWithEmailAndPassword } from "./FirebaseConfig"; // Adjust the path
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the icon library
 
-export default function Login({ navigation }) {
+export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Clear input fields when the screen comes into focus
   useFocusEffect(
     useCallback(() => {
       setEmail("");
       setPassword("");
+      setConfirmPassword("");
     }, [])
   );
 
-  const handleLogin = async () => {
+  const handleSignUp = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in successfully!");
-      navigation.navigate("AuthenticatedScreen"); // Navigate to AuthenticatedScreen after login
+      if (password !== confirmPassword) {
+        console.error("Passwords do not match!");
+        return;
+      }
+      await createUserWithEmailAndPassword(auth, email, password);
+      console.log("User created successfully!");
+      // Clear inputs after successful sign-up
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      navigation.navigate("Login"); // Navigate to Login screen after sign-up
     } catch (error) {
-      console.error("Login error:", error.message);
+      console.error("Sign-up error:", error.message);
     }
   };
 
@@ -64,12 +75,29 @@ export default function Login({ navigation }) {
             />
           </TouchableOpacity>
         </View>
+        <Text style={styles.desc2}>Confirm Password</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm your password"
+            secureTextEntry={!showConfirmPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.iconContainer}>
+            <Icon
+              name={showConfirmPassword ? "eye-off" : "eye"}
+              size={24}
+              color="#3498db"
+            />
+          </TouchableOpacity>
+        </View>
         <Button
-          title="Login"
-          onPress={handleLogin}
+          title="Sign Up"
+          onPress={handleSignUp}
         />
-        <Text style={styles.toggleText} onPress={() => navigation.navigate("SignUp")}>
-          Need an account? Sign Up
+        <Text style={styles.toggleText} onPress={() => navigation.navigate("Login")}>
+          Already have an account? Log In
         </Text>
       </View>
     </View>
@@ -93,7 +121,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 380,
+    height: 650,
     backgroundColor: "#185c6b",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -105,7 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 45,
     fontFamily: "outfit-bold",
     color: "#fff",
-    marginBottom: 1,
+    marginBottom: 10,
+    marginTop: -80,
   },
   desc2: {
     fontSize: 12,
@@ -122,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: -5,
   },
-input: {
+  input: {
     width: "80%",
     height: 40,
     backgroundColor: "#fff",
@@ -143,10 +172,6 @@ input: {
     right: 80,
     top: 10,
     zIndex: 1,
-  },
-  showHideText: {
-    color: "#3498db",
-    marginLeft: 10,
   },
   toggleText: {
     color: "#3498db",
