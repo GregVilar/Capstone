@@ -1,13 +1,17 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { auth, signInWithEmailAndPassword } from "./FirebaseConfig"; // Adjust the path
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the icon library
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const auth = getAuth();
+  const db = getFirestore(); // Initialize Firestore
 
   // Clear input fields when the screen comes into focus
   useFocusEffect(
@@ -19,11 +23,36 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in successfully!");
-      navigation.navigate("AuthenticatedScreen"); // Navigate to AuthenticatedScreen after login
+      // Sign in with email and password
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Fetch user data from Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+
+        // Check if the user's OTP is verified
+        if (!userData.otpVerified) {
+          Alert.alert(
+            "OTP Not Verified",
+            "Please verify your OTP before logging in. A verification link has been sent to your email."
+          );
+          // Optionally, sign out the user if they are logged in but OTP is not verified
+          await auth.signOut();
+          return;
+        }
+
+        console.log("User signed in successfully!");
+        navigation.navigate("AuthenticatedScreen"); // Navigate to AuthenticatedScreen after login
+      } else {
+        throw new Error("User data not found in Firestore");
+      }
     } catch (error) {
       console.error("Login error:", error.message);
+      Alert.alert("Login Error", error.message);
     }
   };
 
@@ -112,8 +141,8 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     color: "#fff",
     marginBottom: 10,
-    textAlign: "left", // Align text to the left
-    width: "80%", // Ensure it takes the full width for alignment
+    textAlign: "left",
+    width: "80%",
   },
   desc3: {
     fontSize: 12,
@@ -122,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: -5,
   },
-input: {
+  input: {
     width: "80%",
     height: 40,
     backgroundColor: "#fff",
@@ -136,17 +165,13 @@ input: {
     position: "relative",
     width: "100%",
     marginLeft: 69,
-    marginBottom: 10, // Add spacing between input fields
+    marginBottom: 10,
   },
   iconContainer: {
     position: "absolute",
     right: 80,
     top: 10,
     zIndex: 1,
-  },
-  showHideText: {
-    color: "#3498db",
-    marginLeft: 10,
   },
   toggleText: {
     color: "#3498db",

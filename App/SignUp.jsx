@@ -1,8 +1,11 @@
+// SignUp.js
 import React, { useState, useCallback } from "react";
-import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { auth, createUserWithEmailAndPassword } from "./FirebaseConfig"; // Adjust the path
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the icon library
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import sendOTP from "./sendOTP"; // Import your OTP sending function
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
@@ -11,7 +14,9 @@ export default function SignUp({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Clear input fields when the screen comes into focus
+  const auth = getAuth();
+  const db = getFirestore(); // Initialize Firestore
+
   useFocusEffect(
     useCallback(() => {
       setEmail("");
@@ -21,20 +26,38 @@ export default function SignUp({ navigation }) {
   );
 
   const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match!");
+      return;
+    }
+
     try {
-      if (password !== confirmPassword) {
-        console.error("Passwords do not match!");
-        return;
+      // Check if email and password are provided
+      if (!email || !password) {
+        throw new Error("Email and password are required.");
       }
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log("User created successfully!");
-      // Clear inputs after successful sign-up
+
+      // Generate a 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Send OTP via Brevo
+      await sendOTP(email, otp);
+
+      // Store OTP and other data in Firestore
+      await setDoc(doc(db, "otp", email), { otp, createdAt: new Date() });
+
+      console.log("OTP sent!");
+
+      // Clear input fields
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      navigation.navigate("Login"); // Navigate to Login screen after sign-up
+
+      // Navigate to OTP Verification Page
+      navigation.navigate("OTPVerification", { email, otp, password }); // Pass the password here
     } catch (error) {
       console.error("Sign-up error:", error.message);
+      Alert.alert("Sign-up Error", error.message);
     }
   };
 
@@ -50,6 +73,7 @@ export default function SignUp({ navigation }) {
           A PWD Accessibility Crowdsourcing Native Mobile Application
         </Text>
 
+        {/* Email Input */}
         <Text style={styles.desc2}>Email</Text>
         <TextInput
           style={styles.input}
@@ -58,6 +82,8 @@ export default function SignUp({ navigation }) {
           value={email}
           onChangeText={setEmail}
         />
+
+        {/* Password Input */}
         <Text style={styles.desc2}>Password</Text>
         <View style={styles.passwordContainer}>
           <TextInput
@@ -75,6 +101,8 @@ export default function SignUp({ navigation }) {
             />
           </TouchableOpacity>
         </View>
+
+        {/* Confirm Password Input */}
         <Text style={styles.desc2}>Confirm Password</Text>
         <View style={styles.passwordContainer}>
           <TextInput
@@ -92,6 +120,7 @@ export default function SignUp({ navigation }) {
             />
           </TouchableOpacity>
         </View>
+
         <Button
           title="Sign Up"
           onPress={handleSignUp}
@@ -103,6 +132,8 @@ export default function SignUp({ navigation }) {
     </View>
   );
 }
+
+// Add styles here...
 
 const styles = StyleSheet.create({
   container: {
@@ -141,8 +172,8 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     color: "#fff",
     marginBottom: 10,
-    textAlign: "left", // Align text to the left
-    width: "80%", // Ensure it takes the full width for alignment
+    textAlign: "left",
+    width: "80%",
   },
   desc3: {
     fontSize: 12,
@@ -165,7 +196,7 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     marginLeft: 69,
-    marginBottom: 10, // Add spacing between input fields
+    marginBottom: 10,
   },
   iconContainer: {
     position: "absolute",
