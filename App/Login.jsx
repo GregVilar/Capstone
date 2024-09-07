@@ -56,6 +56,11 @@ export default function Login({ navigation }) {
     }
   };
 
+  const handleForgotPassword = () => {
+    // Navigate to the Forgot Password screen
+    navigation.navigate("ForgotPassword"); // Ensure you have a "ForgotPassword" screen in your navigation stack
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -97,6 +102,9 @@ export default function Login({ navigation }) {
           title="Login"
           onPress={handleLogin}
         />
+        <Text style={styles.forgotPasswordText} onPress={handleForgotPassword}>
+          Forgot Password?
+        </Text>
         <Text style={styles.toggleText} onPress={() => navigation.navigate("SignUp")}>
           Need an account? Sign Up
         </Text>
@@ -177,5 +185,11 @@ const styles = StyleSheet.create({
     color: "#3498db",
     textAlign: "center",
     marginTop: 10,
+  },
+  forgotPasswordText: {
+    color: "#3498db",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
