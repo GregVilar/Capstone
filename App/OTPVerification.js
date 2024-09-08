@@ -21,6 +21,15 @@ export default function OTPVerification({ route, navigation }) {
       if (index < otpArray.length - 1) {
         inputRefs.current[index + 1].focus();
       }
+    } else if (text.length === 0 && otpArray[index] !== "") {
+      const newOtpArray = [...otpArray];
+      newOtpArray[index] = "";
+      setOtpArray(newOtpArray);
+
+      // Move focus to previous input box if available
+      if (index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
     }
   };
 
@@ -56,13 +65,11 @@ export default function OTPVerification({ route, navigation }) {
 
   return (
     <View style={styles.outerContainer}>
-      {/* Reusing the Help Page title */}
       <View style={styles.container}>
         <Text style={styles.title}>OTP</Text>
         <Text style={styles.subtitle}>Page</Text>
       </View>
 
-      {/* OTP Input section */}
       <View style={styles.innerContainer}>
         <Text style={styles.subtitle2}>Enter OTP sent to {email} {"\n"} </Text>
         <View style={styles.otpContainer}>

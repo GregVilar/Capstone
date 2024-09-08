@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Import Firestore functions
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the icon library
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -62,68 +62,76 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("./../assets/images/Pwdaan-Logo.png")}
-        style={styles.logoImage}
-      />
-      <View style={styles.bottomBox}>
-        <Text style={styles.desc}>PWDaan</Text>
-        <Text style={styles.desc3}>
-          A PWD Accessibility Crowdsourcing Native Mobile Application
-        </Text>
-
-        <Text style={styles.desc2}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <Image
+          source={require("./../assets/images/Pwdaan-Logo.png")}
+          style={styles.logoImage}
         />
-        <Text style={styles.desc2}>Password</Text>
-        <View style={styles.passwordContainer}>
+        <View style={styles.bottomBox}>
+          <Text style={styles.desc}>PWDaan</Text>
+          <Text style={styles.desc3}>
+            A PWD Accessibility Crowdsourcing Native Mobile Application
+          </Text>
+
+          <Text style={styles.desc2}>Email</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconContainer}>
-            <Icon
-              name={showPassword ? "eye-off" : "eye"}
-              size={24}
-              color="#3498db"
+          <Text style={styles.desc2}>Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
             />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconContainer}>
+              <Icon
+                name={showPassword ? "eye-off" : "eye"}
+                size={24}
+                color="#3498db"
+              />
+            </TouchableOpacity>
+          </View>
+          <Button
+            title="Login"
+            onPress={handleLogin}
+          />
+          <Text style={styles.forgotPasswordText} onPress={handleForgotPassword}>
+            Forgot Password?
+          </Text>
+          <Text style={styles.toggleText} onPress={() => navigation.navigate("SignUp")}>
+            Need an account? Sign Up
+          </Text>
         </View>
-        <Button
-          title="Login"
-          onPress={handleLogin}
-        />
-        <Text style={styles.forgotPasswordText} onPress={handleForgotPassword}>
-          Forgot Password?
-        </Text>
-        <Text style={styles.toggleText} onPress={() => navigation.navigate("SignUp")}>
-          Need an account? Sign Up
-        </Text>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollViewContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   logoImage: {
     width: 350,
     height: 350,
-    marginBottom: 340,
+    marginBottom: 340, // Adjusted margin to retain previous style
   },
   bottomBox: {
     position: "absolute",
