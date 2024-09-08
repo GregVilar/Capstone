@@ -1,105 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import Tts from 'react-native-tts'; // Import TTS library
-import SliderComponent from '@react-native-community/slider'; // Import Slider
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import * as Speech from 'expo-speech';
+import Slider from '@react-native-community/slider';
 
-const TTS = () => {
+export default function TTS() {
   const [text, setText] = useState('');
-  const [rate, setRate] = useState(0.5); // Default speech rate
-  const [isTtsReady, setIsTtsReady] = useState(false);
+  const [rate, setRate] = useState(0.5);
+  const [pitch, setPitch] = useState(1);
 
-  // Initialize TTS settings
-  useEffect(() => {
-    Tts.getInitStatus()
-      .then(() => {
-        // TTS is initialized and ready
-        Tts.setDefaultLanguage('en-US');
-        Tts.setDefaultRate(rate);
-        setIsTtsReady(true);
-      })
-      .catch(err => {
-        if (err.code === 'no_engine') {
-          Tts.requestInstallEngine();
-        }
-      });
-  }, [rate]);
-
-  const speakText = () => {
-    if (isTtsReady) {
-      Tts.stop(); // Stop any ongoing TTS
-      Tts.speak(text); // Speak the input text
-    } else {
-      console.log('TTS is not ready yet.');
+  const speak = () => {
+    if (!text) {
+      Alert.alert('Error', 'Please enter text to speak.');
+      return;
     }
-  };
-
-  const handleRateChange = (value) => {
-    setRate(value);
-    if (isTtsReady) {
-      Tts.setDefaultRate(value); // Update the speech rate only if TTS is ready
-    }
+    const options = {
+      rate: rate,
+      pitch: pitch,
+    };
+    Speech.speak(text, options);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Text-to-Speech</Text>
-
       <TextInput
-        style={styles.input}
-        placeholder="Enter text to speak"
+        style={styles.textInput}
         value={text}
         onChangeText={setText}
+        placeholder="Enter text to speak"
       />
-
-      <Button title="Speak" onPress={speakText} />
-
-      <Text style={styles.subtitle}>Adjust Speech Rate</Text>
-      <SliderComponent
-        style={styles.slider}
-        minimumValue={0.1}
-        maximumValue={1.0}
-        value={rate}
-        onValueChange={handleRateChange}
-      />
-
-      <Text>Speech Rate: {rate.toFixed(2)}</Text>
+      <View style={styles.sliderContainer}>
+        <Text>Rate: {rate.toFixed(1)}</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0.1}
+          maximumValue={2.0}
+          step={0.1}
+          value={rate}
+          onValueChange={setRate}
+        />
+      </View>
+      <View style={styles.sliderContainer}>
+        <Text>Pitch: {pitch.toFixed(1)}</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0.5}
+          maximumValue={2.0}
+          step={0.1}
+          value={pitch}
+          onValueChange={setPitch}
+        />
+      </View>
+      <Button title="Speak" onPress={speak} />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
+    padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontFamily: 'outfit-bold',
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontFamily: 'outfit-regular',
-    color: '#555',
-    marginTop: 20,
-  },
-  input: {
-    width: '90%',
+  textInput: {
+    width: '100%',
     height: 40,
-    borderColor: '#ddd',
+    borderColor: 'gray',
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
+    padding: 10,
+    marginBottom: 20,
+  },
+  sliderContainer: {
+    width: '100%',
     marginBottom: 20,
   },
   slider: {
-    width: '90%',
-    height: 40,
-    marginTop: 20,
+    width: '100%',
   },
 });
-
-export default TTS;
