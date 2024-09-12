@@ -131,14 +131,14 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 350,
     height: 350,
-    marginBottom: 340, // Adjusted margin to retain previous style
+    marginBottom: 380, // Adjusted margin to retain previous style
   },
   bottomBox: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    height: 380,
+    height: 450,
     backgroundColor: "#185c6b",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

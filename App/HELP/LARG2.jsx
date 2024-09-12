@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
 
   const LARG2 = () => {
     const navigation = useNavigation();
@@ -70,7 +72,7 @@ import { useNavigation } from '@react-navigation/native';
       style={styles.Button}
       onPress={() => navigation.goBack()}
     >
-      <Text style={styles.BTNtitle}>Go Back</Text>
+      <Text style={[styles.BTNtitle, { textAlign: 'center' }]}>Go Back</Text>
     </TouchableOpacity>
     </View>
   );
@@ -88,7 +90,7 @@ import { useNavigation } from '@react-navigation/native';
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#185c6b',
-      padding: 10,
+      height: hp('13'),
       borderBottomLeftRadius: 30,
       borderBottomRightRadius: 30,
       zIndex: 2, // Ensure this container is above the image
@@ -108,18 +110,20 @@ import { useNavigation } from '@react-navigation/native';
       color: 'tomato',
     },
     image: {
-      width: '100%',
-      height: 220, // Adjust as needed
+      width: wp('100%'),
+      height: hp("30%"), // Adjust as needed
       position: 'absolute',
-      bottom: 460, // Ensure image is positioned at the bottom
+      bottom: hp(54), // Ensure image is positioned at the bottom
       zIndex: 1, // Ensure image is below the main container
     },
     additionalContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#fff',
-      paddingTop: 70,
-      borderRadius: 30,
+      backgroundColor: '#FFF',
+      height: hp(65),
+      paddingTop: 40,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
       position: 'absolute', 
       bottom: 0, 
       left: 0, 
@@ -135,13 +139,14 @@ import { useNavigation } from '@react-navigation/native';
       alignItems: 'center',
       textAlign: 'center',
       color: '#000',
-      top: -70,
+      top: -50,
     },
     Button: {
+      width: wp(87),
       top: -30,
       backgroundColor: '#000',
       paddingVertical: 10,
-      paddingHorizontal: 140,
+      paddingHorizontal: wp(35),
       borderRadius: 5,
     },
     navButtonText: {

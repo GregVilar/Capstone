@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
 
   const Hotline = () => {
     const navigation = useNavigation();
@@ -94,7 +96,7 @@ import { useNavigation } from '@react-navigation/native';
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#185c6b',
-      padding: 20,
+      height: hp('10'),
       borderBottomLeftRadius: 30,
       borderBottomRightRadius: 30,
       zIndex: 2, // Ensure this container is above the image
@@ -114,10 +116,10 @@ import { useNavigation } from '@react-navigation/native';
       color: 'tomato',
     },
     image: {
-      width: '100%',
-      height: 200, // Adjust as needed
+      width: wp('100%'),
+      height: hp("30%"), // Adjust as needed
       position: 'absolute',
-      bottom: 460, // Ensure image is positioned at the bottom
+      bottom: hp(54), // Ensure image is positioned at the bottom
       zIndex: 1, // Ensure image is below the main container
     },
     additionalContainer: {
@@ -125,7 +127,8 @@ import { useNavigation } from '@react-navigation/native';
       alignItems: 'center',
       backgroundColor: '#FF5757',
       paddingTop: 50,
-      borderRadius: 30,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
       position: 'absolute', 
       bottom: 0, 
       left: 0, 

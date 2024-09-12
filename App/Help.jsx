@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
 
 const Help = () => {
 
@@ -32,35 +34,35 @@ const AdditionalContainer = ({ navigation }) => (
       style={styles.navButton}
       onPress={() => navigation.navigate('FAQScreen')}
     >
-      <Text style={styles.navButtonText}>Go to FAQ</Text>
+      <Text style={[styles.navButtonText, { textAlign: 'center' }]}>Go to FAQ</Text>
     </TouchableOpacity>
 
     <TouchableOpacity
       style={styles.navButton2}
       onPress={() => navigation.navigate('AddInfo')}
     >
-      <Text style={styles.navButtonText}>Additional Info</Text>
+      <Text style={[styles.navButtonText, { textAlign: 'center' }]}>Additional Info</Text>
     </TouchableOpacity>
 
     <TouchableOpacity
       style={styles.navButton3}
       onPress={() => navigation.navigate('Hotline')}
     >
-      <Text style={styles.navButtonText}>Hotline</Text>
+      <Text style={[styles.navButtonText, { textAlign: 'center' }]}>Hotline</Text>
     </TouchableOpacity>
 
     <TouchableOpacity
       style={styles.navButton4}
       onPress={() => navigation.navigate('LARG')}
     >
-      <Text style={styles.navButtonText}>Rating Guide</Text>
+      <Text style={[styles.navButtonText, { textAlign: 'center' }]}>Rating Guide</Text>
     </TouchableOpacity>
 
     <TouchableOpacity
       style={styles.navButton5}
       onPress={() => navigation.navigate('LARG3')}
     >
-      <Text style={styles.navButtonText}>Photo Guide</Text>
+      <Text style={[styles.navButtonText, { textAlign: 'center' }]}>Photo Guide</Text>
     </TouchableOpacity>
   </View>
 );
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#185c6b',
-    padding: 10,
+    height: hp('10'),
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     zIndex: 2, // Ensure this container is above the image
@@ -95,18 +97,20 @@ const styles = StyleSheet.create({
     color: 'tomato',
   },
   image: {
-    width: '100%',
-    height: 220, // Adjust as needed
-    position: 'absolute',
-    bottom: 460, // Ensure image is positioned at the bottom
-    zIndex: 1, // Ensure image is below the main container
+    width: wp('100%'),
+      height: hp("30%"), // Adjust as needed
+      position: 'absolute',
+      bottom: hp(54), // Ensure image is positioned at the bottom
+      zIndex: 1, // Ensure image is below the main container
   },
   additionalContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FF5757',
+    height: hp(58),
     paddingBottom: 100,
-    borderRadius: 30,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     position: 'absolute', 
     bottom: 0, 
     left: 0, 
@@ -120,10 +124,11 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   navButton: {
+    width: wp('90%'),
     marginTop: 10,
     backgroundColor: '#fff',
     paddingVertical: 20,
-    paddingHorizontal: 140,
+    paddingHorizontal: wp(35),
     borderRadius: 5,
   },
   navButtonText: {
@@ -132,32 +137,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   navButton2: {
+    width: wp('90%'),
+    padding: 20,
     marginTop: 10,
     backgroundColor: '#fff',
-    paddingVertical: 20,
     borderRadius: 5,
-    paddingHorizontal: 122,
   },
   navButton3: {
+    width: wp('90%'),
+    padding: 20,
     marginTop: 10,
     backgroundColor: '#fff',
-    paddingVertical: 20,
     borderRadius: 5,
-    paddingHorizontal: 150,
   },
   navButton4: {
+    width: wp('90%'),
+    padding: 20,
     marginTop: 10,
     backgroundColor: '#fff',
-    paddingVertical: 20,
     borderRadius: 5,
-    paddingHorizontal: 127,
   },
   navButton5: {
+    width: wp('90%'),
+    padding: 20,
     marginTop: 10,
     backgroundColor: '#fff',
-    paddingVertical: 20,
     borderRadius: 5,
-    paddingHorizontal: 127,
   },
 });
 

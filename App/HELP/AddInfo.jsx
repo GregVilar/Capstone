@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
 
   const AddInfo = () => {
     const navigation = useNavigation();
@@ -38,14 +40,14 @@ import { useNavigation } from '@react-navigation/native';
       style={styles.navButton2}
       onPress={() => navigation.navigate('AddInfo2')}
     >
-      <Text style={styles.navButtonText}>More Info</Text>
+      <Text style={[styles.navButtonText, { textAlign: 'center' }]}>More Info</Text>
     </TouchableOpacity>
   
       <TouchableOpacity
       style={styles.Button}
       onPress={() => navigation.goBack()}
     >
-      <Text style={styles.BTNtitle}>Go Back</Text>
+      <Text style={[styles.BTNtitle, { textAlign: 'center' }]}>Go Back</Text>
     </TouchableOpacity>
     </View>
   );
@@ -63,7 +65,7 @@ import { useNavigation } from '@react-navigation/native';
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#185c6b',
-      padding: 10,
+      height: hp('10'),
       borderBottomLeftRadius: 30,
       borderBottomRightRadius: 30,
       zIndex: 2, // Ensure this container is above the image
@@ -83,27 +85,29 @@ import { useNavigation } from '@react-navigation/native';
       color: 'tomato',
     },
     image: {
-      width: '100%',
-      height: 220, // Adjust as needed
+      width: wp('100%'),
+      height: hp("30%"), // Adjust as needed
       position: 'absolute',
-      bottom: 460, // Ensure image is positioned at the bottom
+      bottom: hp(54), // Ensure image is positioned at the bottom
       zIndex: 1, // Ensure image is below the main container
     },
     additionalContainer: {
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#FF5757',
-      paddingTop: 70,
-      borderRadius: 30,
+      height: hp(58),
+      paddingTop: 40,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
       position: 'absolute', 
       bottom: 0, 
       left: 0, 
       right: 0, 
-      zIndex: 3, 
+      zIndex: 3,  
     },
     additionalText: {
       fontSize: 26,
-      marginTop: 10,
+      marginTop: 35,
       fontWeight: 'bold',
       justifyContent: 'center',
       alignItems: 'center',
@@ -116,7 +120,7 @@ import { useNavigation } from '@react-navigation/native';
       padding: 15,
       borderRadius: 5,
       marginBottom: 20, // Space between the box and the button
-      width: 340, 
+      width: wp(85), 
       top: -60,
     },
     bxTitle: {
@@ -132,10 +136,10 @@ import { useNavigation } from '@react-navigation/native';
       color: '#333',
     },
     Button: {
+      width: wp(87),
       top: -30,
       backgroundColor: '#fff',
       paddingVertical: 10,
-      paddingHorizontal: 140,
       borderRadius: 5,
     },
     BTNtitle: {
@@ -149,12 +153,11 @@ import { useNavigation } from '@react-navigation/native';
         fontWeight: 'bold',
       },
       navButton2: {
-        marginTop: 10,
-        backgroundColor: '#fff',
-        paddingVertical: 10,
-        borderRadius: 5,
-        paddingHorizontal: 135,
-        top: -40,
+      width: wp(87),
+      top: -40,
+      backgroundColor: '#fff',
+      paddingVertical: 10,
+      borderRadius: 5,
       },
   });
 

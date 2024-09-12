@@ -40,6 +40,13 @@ export default function ForgotPassword({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
           <Text style={styles.buttonText}>Send Password Reset Email</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+      style={styles.ButtonBack}
+      onPress={() => navigation.goBack()}
+    >
+      <Text style={styles.BTNtitle}>Go Back</Text>
+    </TouchableOpacity>
       </View>
     </View>
   );
@@ -53,13 +60,15 @@ const styles = StyleSheet.create({
   },
   container: {
     justifyContent: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#185c6b',
-    padding: 10,
+    paddingTop: 70,
+    paddingBottom: 15,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    zIndex: 2,
-    position: 'absolute',
+    zIndex: 2, // Ensure this container is above the image
+    position: 'absolute', // Positioned relative to the outerContainer
     top: 0,
     left: 0,
     right: 0,
@@ -96,6 +105,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
+  },
+  ButtonBack: {
+    top: 20,
+    backgroundColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  BTNtitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   buttonText: {
     color: '#fff',

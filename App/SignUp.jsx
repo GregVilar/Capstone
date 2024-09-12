@@ -121,7 +121,8 @@ export default function SignUp({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Button
+        <Button 
+          style={styles.BTNsu}
           title="Sign Up"
           onPress={handleSignUp}
         />
@@ -145,14 +146,14 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 350,
     height: 350,
-    marginBottom: 340,
+    marginBottom: 380,
   },
   bottomBox: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    height: 650,
+    height: 450,
     backgroundColor: "#185c6b",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     color: "#fff",
     marginBottom: 10,
-    marginTop: -80,
+    marginTop: 0,
   },
   desc2: {
     fontSize: 12,
@@ -207,6 +208,9 @@ const styles = StyleSheet.create({
   toggleText: {
     color: "#3498db",
     textAlign: "center",
-    marginTop: 10,
+    marginBottom: 10,
   },
+  BTNsu : {
+    marginBottom: 30,
+  }
 });
