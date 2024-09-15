@@ -95,7 +95,7 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#FF5757',
-      height: hp(58),
+      height: hp(65),
       paddingTop: 40,
       borderTopLeftRadius: 30,
       borderTopRightRadius: 30,
