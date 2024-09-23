@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, Image, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, Button, Image, TouchableOpacity,Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const DiscussionLandmarks1 = () => {
@@ -46,18 +46,18 @@ const AdditionalContainer = ({ navigation }) => (
   <View style={styles.additionalContainer}>
     <Text style={styles.additionalText}>General Discussion</Text>
     <Text style={styles.additionalText1}>Share Experiences and Story</Text>
-    <ThreadContainer/>
+    
   </View>
 );
 
-const ThreadContainer= () =>(
-  <View style={styles.threadContainer}>
-    <Text style={styles.textLocation}>Jollibee</Text>
-    <Text style={styles.textDiscussHeader}>Missing Landmark- Jollibee Vicente Cruz</Text>
-    <Text style={styles.textDiscussContent}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla a varius sapien. Integer lobortis lectus a dolor scelerisque, vel laoreet arcu imperdiet. Vestibulum sagittis neque eu neque placerat, nec tempor dui scelerisque. Praesent enim lacus, efficitur a tempus a, lobortis a libero. Aliquam vel ex imperdiet, volutpat lorem sed, fringilla dui.</Text>
-     </View>
+// const ThreadContainer= () =>(
+//   <View style={styles.threadContainer}>
+//     <Text style={styles.textLocation}>Jollibee</Text>
+//     <Text style={styles.textDiscussHeader}>Missing Landmark- Jollibee Vicente Cruz</Text>
+//     <Text style={styles.textDiscussContent}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla a varius sapien. Integer lobortis lectus a dolor scelerisque, vel laoreet arcu imperdiet. Vestibulum sagittis neque eu neque placerat, nec tempor dui scelerisque. Praesent enim lacus, efficitur a tempus a, lobortis a libero. Aliquam vel ex imperdiet, volutpat lorem sed, fringilla dui.</Text>
+//      </View>
      
-);
+// );
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,

@@ -1,38 +1,121 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button, Image, TouchableOpacity} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Button, Image, TouchableOpacity, Alert, Modal, TextInput, FlatList } from 'react-native';
+import { db } from '../FirebaseConfig'; // Import the Firestore instance
+import { collection, addDoc, onSnapshot, serverTimestamp, doc, deleteDoc } from 'firebase/firestore'; // Firestore methods
 
 const DiscussionGeneral = () => {
-  const navigation = useNavigation();
+  const [discussions, setDiscussions] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
 
-  // return (
-  //   <View style={styles.additionalContainer}>
-  //     <Text style={styles.DiscussHeader}>General Discussion</Text>
-  //     <Text style={styles.DiscussSubHeader}>Share Experiences and Story</Text>
-  //     <Button
-  //       title="Go to Landmarks"
-  //       onPress={() => navigation.navigate('DiscussionLandmarks')}
-  //     />
-  //   </View>
-  // );
+  // Fetch discussions from Firestore on component mount
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'discussions'), (snapshot) => {
+      const fetchedDiscussions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setDiscussions(fetchedDiscussions);
+    });
 
-// const ImageComponent = () => (
-//   <Image
-//     source={require('../assets/images/DiscussHeader.png')}
-//     style={styles.image}
-//   />
-// );
-return (
-  <View style={styles.outerContainer}>
-    <ImageComponent />
-    <View style={styles.container}>
-      <Text style={styles.title}>Forum</Text>
-      <Text style={styles.subtitle}>Page</Text>
+    return () => unsubscribe();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (title && content) {
+      try {
+        await addDoc(collection(db, 'discussions'), {
+          title,
+          content,
+          createdAt: serverTimestamp(),
+        });
+        Alert.alert('Discussion Posted');
+        setModalVisible(false);
+        setTitle('');
+        setContent('');
+      } catch (error) {
+        Alert.alert('Error', `Error adding discussion: ${error.message}`);
+      }
+    } else {
+      Alert.alert('Error', 'Please fill out both fields.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    console.log('Attempting to delete discussion with id:', id);
+    Alert.alert(
+      "Delete Discussion",
+      "Are you sure you want to delete this discussion?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'discussions', id)); // Correct way to delete
+              console.log('Discussion deleted with id:', id);
+              Alert.alert('Discussion deleted successfully');
+            } catch (error) {
+              console.error('Error deleting discussion: ', error);
+              Alert.alert('Error', `Failed to delete discussion: ${error.message}`);
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.outerContainer}>
+      <ImageComponent />
+      <View style={styles.container}>
+        <Text style={styles.title}>Forum</Text>
+        <Text style={styles.subtitle}>Page</Text>
+      </View>
+      <AdditionalContainer discussions={discussions} onDelete={handleDelete} />
+
+      <View style={styles.floatingButtonContainer}>
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.buttonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Create Discussion</Text>
+            <TextInput
+              placeholder="Enter Title"
+              value={title}
+              onChangeText={setTitle}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Enter Content"
+              value={content}
+              onChangeText={setContent}
+              style={[styles.input, { height: 100 }]}
+              multiline={true}
+            />
+            <View style={styles.buttonGroup}>
+              <Button title="Submit" onPress={handleSubmit} />
+              <Button title="Cancel" color="red" onPress={() => setModalVisible(false)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
-    <AdditionalContainer/>
-  </View>
-);
-
+  );
 };
 
 const ImageComponent = () => (
@@ -42,27 +125,33 @@ const ImageComponent = () => (
   />
 );
 
-const AdditionalContainer = ({ navigation }) => (
+const AdditionalContainer = ({ discussions, onDelete }) => (
   <View style={styles.additionalContainer}>
     <Text style={styles.additionalText}>General Discussion</Text>
     <Text style={styles.additionalText1}>Share Experiences and Story</Text>
-    <ThreadContainer/>
+    <FlatList
+      data={discussions}
+      keyExtractor={item => item.id}
+      renderItem={({ item }) => (
+        <View style={styles.threadContainer}>
+          <Text style={styles.textDiscussHeader}>{item.title}</Text>
+          <Text style={styles.textDiscussContent}>{item.content}</Text>
+          <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteButton}>
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      contentContainerStyle={styles.flatListContent}
+      showsVerticalScrollIndicator={false}
+    />
   </View>
 );
 
-const ThreadContainer= () =>(
-  <View style={styles.threadContainer}>
-    <Text style={styles.textLocation}>Jollibee</Text>
-    <Text style={styles.textDiscussHeader}>Missing Landmark- Jollibee Vicente Cruz</Text>
-    <Text style={styles.textDiscussContent}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla a varius sapien. Integer lobortis lectus a dolor scelerisque, vel laoreet arcu imperdiet. Vestibulum sagittis neque eu neque placerat, nec tempor dui scelerisque. Praesent enim lacus, efficitur a tempus a, lobortis a libero. Aliquam vel ex imperdiet, volutpat lorem sed, fringilla dui.</Text>
-     </View>
-     
-);
+// Styles
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
     backgroundColor: '#fff',
-    position: 'relative',
   },
   container: {
     justifyContent: 'center',
@@ -71,12 +160,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    zIndex: 2, // Ensure this container is above the image
-    position: 'absolute', // Positioned relative to the outerContainer
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
+    zIndex: 2,
   },
+  
   title: {
     fontSize: 40,
     fontWeight: 'bold',
@@ -89,117 +179,122 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 220, // Adjust as needed
+    height: 220,
     position: 'absolute',
-    bottom: 440, // Ensure image is positioned at the bottom
-    zIndex: 1, // Ensure image is below the main container
+    bottom: 440,
+    zIndex: 1,
   },
   additionalContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    
     backgroundColor: '#FF5757',
-    paddingBottom: 500,
+    paddingBottom: 300,
     borderRadius: 30,
-    position: 'absolute', 
-    top:290,
-    left: 0, 
-    right: 0, 
-    zIndex: 3, 
+    top: 290,
+    left: 0,
+    right: 0,
+    zIndex: 3,
+    flex:1,
+    
+   
   },
-  threadContainer: {
-    justifyContent: 'center',
-    backgroundColor: '#FFF7F7',
-    padding: 50,
-    position: 'absolute',
-    width:350, 
-    top:120,
+  flatListContent: {
+    flexGrow: 1,
   },
   additionalText: {
     fontSize: 25,
     marginTop: 30,
-    right:80,
     fontWeight: 'bold',
     color: 'white',
+   right:-40
   },
   additionalText1: {
     fontSize: 15,
     marginTop: 10,
-    right:90,
     fontWeight: 'bold',
     color: 'white',
+    right:-40,
+    marginBottom:10,
   },
-  textLocation:{
-    fontWeight: 'bold',
-    marginTop: 10,
-    right:110,
-    color: 'black',
+  floatingButtonContainer: {
     position: 'absolute',
-    bottom:80,
-    left: 50, 
-    right: 0, 
-    fontSize: 10,
+    bottom: 30,
+    right: 30,
+    zIndex: 100,
   },
-  textDiscussHeader:{
-    fontWeight: 'bold',
-    marginTop: 0,
-    left: 50, 
-    bottom:60,
-    right: 0,
-    position: 'absolute',
+  floatingButton: {
+    backgroundColor: 'white',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  buttonText: {
     color: 'black',
-    fontSize: 10,
-  },
-  textDiscussContent:{
+    fontSize: 28,
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  threadContainer: {
+    justifyContent:"center",
+    alignContent:"center",
+    backgroundColor: '#FFF7F7',
+    padding: 30,
+    marginVertical: 10,
+    borderRadius: 3,
+    width: 300, // or change to 'auto' or fixed width
+    height: 'auto', // or any height you want
+    overflow: 'visible', // Allow content to overflow if needed
+    right:-60,
+  },
+  textDiscussHeader: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  textDiscussContent: {
+    fontSize: 12,
     color: 'black',
-    alignContent:'center',
-    textAlign:'center',
-    left: 0, 
-    bottom:10,
-    right: 0,
-    position: 'absolute',
-    fontSize: 10,
-  },
-  
-  navButton: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 20,
-    paddingHorizontal: 140,
-    borderRadius: 5,
-  },
-  navButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  navButton2: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 20,
-    borderRadius: 5,
-    paddingHorizontal: 122,
-  },
-  navButton3: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 20,
-    borderRadius: 5,
-    paddingHorizontal: 150,
-  },
-  navButton4: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 20,
-    borderRadius: 5,
-    paddingHorizontal: 127,
-  },
-  navButton5: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 20,
-    borderRadius: 5,
-    paddingHorizontal: 127,
   },
 });
+
+
 export default DiscussionGeneral;
