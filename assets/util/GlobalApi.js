@@ -11,7 +11,8 @@ const config={
             'places.formattedAddress',
             'places.location',
             'places.photos',
-            'places.shortFormattedAddress']
+            'places.shortFormattedAddress',
+            'places.id']
     }
 }
 
