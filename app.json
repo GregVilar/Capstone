@@ -24,7 +24,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-router",
+      "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow PWDaan App to use your location."
+        }
     ]
   }
 }

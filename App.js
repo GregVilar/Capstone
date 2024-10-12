@@ -1,41 +1,63 @@
-import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { useState, useEffect } from 'react';
+import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import Login from "./App/Login";
+import * as Location from 'expo-location';
+import MainNavigator from "./App/MainNavigator"; // Import MainNavigator
+import { UserLocationContext } from "./App/Maps/UserLocationContext";
 
-SplashScreen.preventAutoHideAsync();
+
 
 export default function App() {
-  const [loaded] = useFonts({
-    "outfit-semi": require("./assets/fonts/Outfit-SemiBold.ttf"),
+  
+  const [fontsLoaded] = useFonts({
     "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"),
+    "outfit-regular": require("./assets/fonts/Outfit-Regular.ttf"),
+          
   });
 
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
   useEffect(() => {
-    if (loaded) {
+    (async () => {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location.coords);
+
+    })();
+  }, []);
+
+  let text = 'Waiting..';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
+
+  React.useEffect(() => {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded]);
 
-  if (!loaded) {
-    return null;
+  if (!fontsLoaded) {
+    return null; // Optionally show a loading screen here
   }
 
   return (
-    <View style={styles.container}>
-      <Login />
-      <StatusBar style="auto" />
-    </View>
+    <UserLocationContext.Provider 
+    value={{location,setLocation}}>
+    <NavigationContainer>
+      <MainNavigator />
+    </NavigationContainer>
+    </UserLocationContext.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
