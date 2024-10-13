@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const sendOTP = async (email, otp) => {
-  const brevoAPIKey = process.env.BREVO_API_KEY || 'YOUR_BREVO_API_KEY'; // Ensure your API key is set
+
+  const brevoAPIKey = process.env.BREVO_API_KEY || 'API_KEY'; // Ensure your API key is set
   const senderEmail = 'mynameisjohnsabog@gmail.com'; // Replace with your sender email
   const templateId = 1; // Replace with your Brevo template ID
 
@@ -18,7 +19,7 @@ const sendOTP = async (email, otp) => {
       },
       {
         headers: {
-          'api-key': '',
+          'api-key': 'API_KEY',
           'Content-Type': 'application/json',
         }
       }

@@ -1,4 +1,3 @@
-// SignUp.js
 import React, { useState, useCallback } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -6,6 +5,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import sendOTP from "./sendOTP"; // Import your OTP sending function
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-  BTNsu : {
+  BTNsu: {
     marginBottom: 30,
   }
 });
