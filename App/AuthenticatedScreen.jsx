@@ -5,6 +5,7 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '
 import { DrawerActions } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { auth } from './FirebaseConfig'; // Adjust path if needed
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import Home from './Home';
 import Favorites from './Favorites';
 import ForumStack from './ForumStack';
@@ -18,13 +19,13 @@ import SettingsScreen from './SettingsScreen';
 const handleLogout = async (navigation) => {
   try {
     await auth.signOut();
+    await AsyncStorage.removeItem('userToken'); // Clear the user token
     console.log("User logged out successfully!");
     navigation.navigate("Login"); // Navigate to Login screen after logout
   } catch (error) {
     console.error("Logout error:", error.message);
   }
 };
-
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();

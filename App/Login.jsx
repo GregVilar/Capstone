@@ -1,30 +1,60 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, Image, StyleSheet, TextInput, Button, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-export default function Login({ navigation }) {
+export default function Login() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(""); // Keep password state
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
-  const db = getFirestore(); // Initialize Firestore
+  const db = getFirestore();
 
-  // Clear input fields when the screen comes into focus
+  // Load stored email on screen focus
   useFocusEffect(
     useCallback(() => {
-      setEmail("");
-      setPassword("");
+      const loadStoredCredentials = async () => {
+        try {
+          const storedEmail = await AsyncStorage.getItem("email");
+          if (storedEmail) {
+            setEmail(storedEmail);
+          }
+        } catch (error) {
+          console.error("Error loading stored credentials:", error);
+        }
+      };
+
+      loadStoredCredentials();
     }, [])
   );
 
   const handleLogin = async () => {
+    setLoading(true); // Start loading
+
     try {
-      // Sign in with email and password
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Fetch user data from Firestore
@@ -40,25 +70,34 @@ export default function Login({ navigation }) {
             "OTP Not Verified",
             "Please verify your OTP before logging in. A verification link has been sent to your email."
           );
-          // Optionally, sign out the user if they are logged in but OTP is not verified
           await auth.signOut();
+          await AsyncStorage.clear(); // Clear stored credentials
           return;
         }
 
+        // Store the email in AsyncStorage for persistent login
+        await AsyncStorage.setItem("email", email);
+        setPassword(""); // Clear the password state after successful login
+
         console.log("User signed in successfully!");
-        navigation.navigate("AuthenticatedScreen"); // Navigate to AuthenticatedScreen after login
+        navigation.navigate("AuthenticatedScreen"); // Navigate to the authenticated screen
       } else {
         throw new Error("User data not found in Firestore");
       }
     } catch (error) {
       console.error("Login error:", error.message);
       Alert.alert("Login Error", error.message);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   const handleForgotPassword = () => {
-    // Navigate to the Forgot Password screen
-    navigation.navigate("ForgotPassword"); // Ensure you have a "ForgotPassword" screen in your navigation stack
+    navigation.navigate("ForgotPassword");
+  };
+
+  const handleSignUp = () => {
+    navigation.navigate("SignUp");
   };
 
   return (
@@ -94,7 +133,10 @@ export default function Login({ navigation }) {
               value={password}
               onChangeText={setPassword}
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconContainer}>
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.iconContainer}
+            >
               <Icon
                 name={showPassword ? "eye-off" : "eye"}
                 size={24}
@@ -103,13 +145,14 @@ export default function Login({ navigation }) {
             </TouchableOpacity>
           </View>
           <Button
-            title="Login"
+            title={loading ? "Loading..." : "Login"}
             onPress={handleLogin}
+            disabled={loading}
           />
           <Text style={styles.forgotPasswordText} onPress={handleForgotPassword}>
             Forgot Password?
           </Text>
-          <Text style={styles.toggleText} onPress={() => navigation.navigate("SignUp")}>
+          <Text style={styles.toggleText} onPress={handleSignUp}>
             Need an account? Sign Up
           </Text>
         </View>
@@ -131,7 +174,7 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 350,
     height: 350,
-    marginBottom: 380, // Adjusted margin to retain previous style
+    marginBottom: 380,
   },
   bottomBox: {
     position: "absolute",
