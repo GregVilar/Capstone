@@ -19,7 +19,7 @@ const sendOTP = async (email, otp) => {
       },
       {
         headers: {
-          'api-key': '',
+          'api-key': 'API_KEY',
           'Content-Type': 'application/json',
         }
       }
