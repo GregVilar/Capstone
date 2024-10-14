@@ -6,18 +6,14 @@ const API_KEY="";
 const config={
     headers:{
         'Content-Type':'application/json',
-        'X-Goog-Api-Key':"API_KEY",
-        'X-Goog-Api-Key':"API_KEY",
+        'X-Goog-Api-Key':"",
         'X-Goog-FieldMask':['places.displayName',
             'places.formattedAddress',
             'places.location',
             'places.photos',
             'places.shortFormattedAddress',
             'places.id']
-            'places.shortFormattedAddress',
-            'places.id']
     }
-} 
 } 
 
 const NewNearByPlace=(data)=>axios.post(BASE_URL,data,config);
