@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { auth, firestore } from "./FirebaseConfig"; // Adjust the path
+import { auth, db } from "./FirebaseConfig"; // Adjust the path as needed
 
 export default function OTPVerification({ route, navigation }) {
   const { email, otp: expectedOtp, password } = route.params;
@@ -47,14 +47,17 @@ export default function OTPVerification({ route, navigation }) {
       }
 
       // Create the user after successful OTP verification
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user; // Get the user object
 
-      // Create a document in Firestore to store OTP verification status
-      const user = auth.currentUser;
-      if (user) {
-        await setDoc(doc(firestore, "users", user.uid), { otpVerified: true });
-      }
+      console.log("Creating Firestore document for user ID:", user.uid); // Log user ID
+      // Create a document in Firestore to store OTP verification status and user ID
+      await setDoc(doc(db, "users", user.uid), { 
+        otpVerified: true,
+        userId: user.uid, // Store the user ID here
+      });
 
+      console.log("Document created successfully"); // Log success
       Alert.alert("Success", "User created successfully!");
       navigation.navigate("Login");
     } catch (error) {

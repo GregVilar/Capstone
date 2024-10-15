@@ -5,6 +5,7 @@ import SignUp from "./SignUp";
 import ForgotPassword from "./ForgotPassword";
 import OTPVerification from "./OTPVerification";
 import AuthenticatedScreen from "./AuthenticatedScreen";
+import HelpStack from "./HelpStack"; // Import HelpStack
 import { auth } from "./FirebaseConfig"; // Adjust path if needed
 
 const Stack = createStackNavigator();
@@ -22,15 +23,20 @@ function MainNavigator() {
 
   return (
     <Stack.Navigator
-    screenOptions={{
-      headerShown: false, // Hide header for all screens in this stack
-    }}>
+      screenOptions={{
+        headerShown: false, // Hide header for all screens in this stack
+      }}
+    >
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
       <Stack.Screen name="OTPVerification" component={OTPVerification} />
       {user && (
-        <Stack.Screen name="AuthenticatedScreen" component={AuthenticatedScreen} options={{ headerShown: false }} />
+        <>
+          <Stack.Screen name="AuthenticatedScreen" component={AuthenticatedScreen} options={{ headerShown: false }} />
+          {/* Add HelpStack after authentication */}
+          <Stack.Screen name="Help" component={HelpStack} />
+        </>
       )}
     </Stack.Navigator>
   );

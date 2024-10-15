@@ -9,14 +9,9 @@ import { app } from '../FirebaseConfig';
 
 export default function PlaceListView({ placeList, onMinimize }) {
     const flatListRef = useRef(null);
-    const { selectedMarker, setSelecterdMarker } = useContext(SelectMarkerContext);
-    const [favList,setFavList]=useState([]);
-
+    const { selectedMarker } = useContext(SelectMarkerContext);
+    const [favList, setFavList] = useState([]);
     const [user, setUser] = useState(null); // State for storing the authenticated user
-
-    useEffect(() => {
-        selectedMarker && scrollToIndex(selectedMarker);
-    }, [selectedMarker]);
 
     // Fetch the authenticated user
     useEffect(() => {
@@ -37,7 +32,6 @@ export default function PlaceListView({ placeList, onMinimize }) {
             getFav();  // Call getFav() only when user is available
         }
     }, [user]);
-    
 
     // Fetch favorite places for the authenticated user
     const getFav = async () => { 
@@ -45,25 +39,21 @@ export default function PlaceListView({ placeList, onMinimize }) {
             console.log('No user is authenticated.');
             return;
         }
-        setFavList([])
+        setFavList([]);
         const q = query(collection(db, "fav-place"), 
         where("email", "==", user.email)); // Use Firebase user's email
 
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
             console.log(doc.id, " => ", doc.data());
-            setFavList(favList=>[...favList,doc.data()]);
+            setFavList(favList => [...favList, doc.data()]);
         });
-    };
-
-    const scrollToIndex = (index) => {
-        flatListRef.current?.scrollToIndex({ animated: true, index });
     };
 
     const getItemLayout = (_, index) => ({
         length: Dimensions.get('window').width,
         offset: Dimensions.get('window').width * index,
-        index
+        index,
     });
 
     const [isMinimized, setIsMinimized] = useState(false); // State to track if minimized
@@ -76,11 +66,10 @@ export default function PlaceListView({ placeList, onMinimize }) {
         });
     };
 
-    const isFav=(place)=>{
-        const result=favList.find(item=>item.place.id==place.id);
-        console.log(result)
-        return result?true:false;
-    }
+    const isFav = (place) => {
+        const result = favList.find(item => item.place.id == place.id);
+        return result ? true : false;
+    };
 
     return (
         <View style={styles.container}>
@@ -99,14 +88,11 @@ export default function PlaceListView({ placeList, onMinimize }) {
                     ref={flatListRef}
                     getItemLayout={getItemLayout}
                     showsHorizontalScrollIndicator={false}
-                    renderItem={({ item, index }) => (
-                        <View key={index}>
-                            <PlaceItem place={item} 
-                                isFav={isFav(item)}
-                                markedFav={()=>getFav()}
-                            />
-                                
-                        </View>
+                    renderItem={({ item }) => (
+                        <PlaceItem place={item} 
+                            isFav={isFav(item)}
+                            markedFav={() => getFav()}
+                        />
                     )}
                     keyExtractor={(item, index) => index.toString()} // Ensure a unique key for each item
                 />
