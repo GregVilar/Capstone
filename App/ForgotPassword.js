@@ -1,19 +1,28 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPassword({ navigation }) {
   const [email, setEmail] = useState("");
   const auth = getAuth();
+  const { t } = useTranslation(); // Use the translation hook
 
   const handlePasswordReset = async () => {
     try {
       if (!email) {
-        throw new Error("Please enter your email address.");
+        throw new Error(t("forgotPasswordPage.enterEmail")); // Use translation for error message
       }
 
       await sendPasswordResetEmail(auth, email);
-      Alert.alert("Success", "Password reset email sent.");
+      Alert.alert("Success", t("forgotPasswordPage.sendButton"));
       setEmail(""); // Clear the email field
       navigation.navigate("Login"); // Navigate back to Login screen
     } catch (error) {
@@ -25,28 +34,28 @@ export default function ForgotPassword({ navigation }) {
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
-        <Text style={styles.title}>Reset</Text>
-        <Text style={styles.title2}>Password</Text>
+        <Text style={styles.title}>{t("forgotPasswordPage.title")}</Text>
+        <Text style={styles.subtitle}>{t("forgotPasswordPage.subtitle")}</Text>
       </View>
 
       <View style={styles.innerContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Enter your email"
+          placeholder={t("forgotPasswordPage.enterEmail")} // Use translation for placeholder
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
         <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
-          <Text style={styles.buttonText}>Send Password Reset Email</Text>
+          <Text style={styles.buttonText}>{t("forgotPasswordPage.sendButton")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-      style={styles.ButtonBack}
-      onPress={() => navigation.goBack()}
-    >
-      <Text style={styles.BTNtitle}>Go Back</Text>
-    </TouchableOpacity>
+          style={styles.ButtonBack}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.BTNtitle}>{t("forgotPasswordPage.goBackButton")}</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -60,15 +69,14 @@ const styles = StyleSheet.create({
   },
   container: {
     justifyContent: 'center',
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#185c6b',
     paddingTop: 70,
     paddingBottom: 15,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    zIndex: 2, // Ensure this container is above the image
-    position: 'absolute', // Positioned relative to the outerContainer
+    zIndex: 2,
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -78,7 +86,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  title2: {
+  subtitle: {
     fontSize: 30,
     fontWeight: 'bold',
     color: 'tomato',

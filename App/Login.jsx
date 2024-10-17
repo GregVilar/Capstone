@@ -5,7 +5,6 @@ import {
   Image,
   StyleSheet,
   TextInput,
-  Button,
   TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
@@ -17,8 +16,10 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useTranslation } from "react-i18next"; // Import translation hook
 
-export default function Login() {
+const Login = () => {
+  const { t } = useTranslation(); // Initialize translation function
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState(""); // Keep password state
@@ -116,19 +117,19 @@ export default function Login() {
             A PWD Accessibility Crowdsourcing Native Mobile Application
           </Text>
 
-          <Text style={styles.desc2}>Email</Text>
+          <Text style={styles.desc2}>{t('loginPage.emailLabel')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your email"
+            placeholder={t('loginPage.emailLabel')}
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
           />
-          <Text style={styles.desc2}>Password</Text>
+          <Text style={styles.desc2}>{t('loginPage.passwordLabel')}</Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Enter your password"
+              placeholder={t('loginPage.passwordLabel')}
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
@@ -144,22 +145,26 @@ export default function Login() {
               />
             </TouchableOpacity>
           </View>
-          <Button
-            title={loading ? "Loading..." : "Login"}
+          <TouchableOpacity
+            style={styles.button}
             onPress={handleLogin}
             disabled={loading}
-          />
+          >
+            <Text style={styles.buttonText}>
+              {loading ? t('loginPage.loading') : t('loginPage.loginButton')}
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.forgotPasswordText} onPress={handleForgotPassword}>
-            Forgot Password?
+            {t('loginPage.forgotPassword')}
           </Text>
           <Text style={styles.toggleText} onPress={handleSignUp}>
-            Need an account? Sign Up
+            {t('loginPage.signUpText')}
           </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -232,15 +237,39 @@ const styles = StyleSheet.create({
     top: 10,
     zIndex: 1,
   },
-  toggleText: {
-    color: "#3498db",
-    textAlign: "center",
-    marginTop: 10,
-  },
   forgotPasswordText: {
-    color: "#3498db",
+    color: "#fff", // Change color to white
     textAlign: "center",
-    marginTop: 10,
+    marginTop: 5,
     marginBottom: 10,
+    fontSize: 13, // Increase font size for better visibility
+    fontWeight: "bold", // Make text bold
+  },
+  toggleText: {
+    color: "#fff", // Change color to white
+    textAlign: "center",
+    marginTop: 4,
+    fontSize: 13, // Increase font size for better visibility
+    fontWeight: "bold", // Make text bold
+  },
+  button: {
+    backgroundColor: '#FF5757', // Change background color to #FF5757
+    paddingVertical: 10, // Vertical padding for button height
+    width: "80%", // Match the width with the input fields
+    borderRadius: 8, // Slightly smaller border radius
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3, // Reduce elevation for a smaller button
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16, // Slightly smaller font size for the button text
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
+
+export default Login; // Only one default export

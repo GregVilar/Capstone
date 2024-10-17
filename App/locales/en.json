@@ -1,0 +1,131 @@
+{
+    "homeScreen": {
+      "title": "Click the Button to Translate App Language",
+      "welcomeMessage": "The Current Language is English",
+      "header": "Translate the App"
+    },
+    "loginPage": {
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "loginButton": "Login",
+      "forgotPassword": "Forgot Password?",
+      "signUpText": "Need an account? Sign Up",
+      "loading": "Loading..."
+    },
+    "forgotPasswordPage": {
+      "title": "Reset",
+      "subtitle": "Password",
+      "enterEmail": "Enter your email",
+      "sendButton": "Send Password Reset Email",
+      "goBackButton": "Go Back"
+    },
+    "signUpPage": {
+      "title": "Sign Up",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "signUpButton": "Sign Up",
+      "loginText": "Already have an account? Log In"
+    },
+    "otpVerification": {
+      "title": "OTP",
+      "subtitle": "Page",
+      "subtitle2": "Enter OTP sent to {{email}}",
+      "verifyButton": "Verify OTP",
+      "invalidOtp": "Invalid OTP",
+      "invalidOtpMessage": "The OTP you entered is incorrect.",
+      "success": "Success",
+      "userCreated": "User created successfully!",
+      "error": "Error",
+      "errorCreatingUser": "An error occurred while creating the user.",
+      "passwordRequired": "Password is required."
+    },
+      "tts": {
+        "title": "Text-To-Speech",
+        "placeholder": "Enter text",
+        "rate": "Rate",
+        "pitch": "Pitch",
+        "speakButton": "Speak",
+        "error": "Error",
+        "enterText": "Please enter text to speak."
+      },
+      "settings": {
+        "title": "Settings",
+        "page": "Page",
+        "settingsScreen": "Settings Screen",
+        "invertColors": "Invert Colors",
+        "fontSize": "Font Size",
+        "increase": "Increase",
+        "decrease": "Decrease",
+        "currentFontSize": "Current Font Size"
+    },
+    "help": {
+      "title": "Help",
+      "subtitle": "Page",
+      "portal": "Help Portal",
+      "goToFAQ": "Go to FAQ",
+      "additionalInfo": "Additional Info",
+      "hotline": "Hotline",
+      "ratingGuide": "Rating Guide",
+      "photoGuide": "Photo Guide"
+    },
+  
+    "faq": {
+      "title": "Help",
+      "subtitle": "Page",
+      "faqTitle": "Frequently Asked Question",
+      "speechToTextQuestion": "How to use Speech-To-Text?",
+      "speechToTextAnswer": "Here is how you use Speech-To-Text...",
+      "goBackButton": "Go Back"
+    },
+    "addInfo": {
+      "raTitle": "RA 7277 - Magna Carta of Disabled Persons",
+      "raDescription": "A law enacted in the Philippines in 1992. It aims to promote the rights and welfare of persons with disabilities (PWDs) by ensuring their equal opportunities, access to education, employment, healthcare, and social services. The law mandates the elimination of discrimination against PWDs and provides guidelines for the government and private sectors to create an inclusive environment.",
+      "moreInfo": "More Info",
+      "goBack": "Go Back"
+    },
+    "faq1": {
+      "title": "Help",
+      "subtitle": "Page",
+      "raTitle": "RA 344 - Accessibility Law",
+      "raDescription": "A Philippine law enacted in 1983 to enhance the mobility of persons with disabilities (PWDs) by requiring the installation of accessibility features in public buildings, transportation, and infrastructure. The law mandates that facilities such as ramps, handrails, and elevators be provided in public and private establishments to ensure that PWDs, the elderly, and others with mobility challenges can access these spaces safely and comfortably.",
+      "goBackButton": "Go Back"
+    },
+    "larg": {
+      "title": "Help",
+      "subtitle": "Page",
+      "accessibilityRatingGuide": "Location Accessibility Rating Guide",
+      "accessibleAllRooms": "All rooms are accessible using a wheelchair and have complete accessibility features (Ramps, ground level entrances, elevators)",
+      "accessibleSomeRooms": "Some rooms are accessible using a wheelchair and lack accessibility features (Ramps, ground level entrances, elevators)",
+      "notAccessible": "Not accessible",
+      "moreInfo": "More Info",
+      "goBack": "Go Back"
+    },
+    "larg2": {
+      "help": "Help",
+      "page": "Page",
+      "accessibilityRatingGuide": "Location Accessibility Rating Guide",
+      "pictureInstructions": "When taking a picture, the establishment should be visible and should follow a specific hand gesture to validate authenticity.",
+      "goBack": "Go Back"
+    },
+    "larg3": {
+      "title": "Help",
+      "subtitle": "Page",
+      "additionalText": "Location Accessibility Rating Guide",
+      "goBack": "Go Back"
+    },
+    "authScreen": {
+      "menu": "Menu",
+      "logout": "Logout",
+      "home": "Home",
+      "forum": "Forum",
+      "favorite": "Favorite",
+      "profile": "Profile",
+      "tts": "Text-to-Speech",
+      "translate": "Translate",
+      "help": "Help",
+      "settings": "Settings"
+    }
+      
+  }
+  

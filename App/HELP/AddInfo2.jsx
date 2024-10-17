@@ -1,158 +1,181 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { useTranslation } from 'react-i18next';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useColorInversion } from '../ColorInversionContext'; // Import the context
 
+const AddInfo2 = () => {
+  const navigation = useNavigation();
+  const { t } = useTranslation(); // Initialize the translation function
+  const { isInverted } = useColorInversion(); // Get the inversion state
 
-  const AddInfo2 = () => {
-    const navigation = useNavigation();
-
-    return (
-        <View style={styles.outerContainer}>
-          <ImageComponent />
-          <View style={styles.container}>
-            <Text style={styles.title}>Help</Text>
-            <Text style={styles.subtitle}>Page</Text>
-          </View>
-          <AdditionalContainer navigation={navigation} />
-        </View>
-    );
-  };
-
-  const ImageComponent = () => (
-    <Image
-      source={require('../../assets/images/FAQ-1.png')}
-      style={styles.image}
-    />
-  );
-
-  const AdditionalContainer = ({ navigation }) => (
-    <View style={styles.additionalContainer}>
-      <Text style={styles.additionalText}>RA 344 - Accessibility Law</Text>
-      
-      <View style={styles.textBox}>
-        <Text style={styles.bxTitle}>
-        a Philippine law enacted in 1983 to enhance the mobility of persons with disabilities (PWDs) by requiring the installation of accessibility features in public buildings, transportation, and infrastructure. The law mandates that facilities such as ramps, handrails, and elevators be provided in public and private establishments to ensure that PWDs, the elderly, and others with mobility challenges can access these spaces safely and comfortably.
+  return (
+    <View style={[styles.outerContainer, isInverted && styles.invertedOuterContainer]}>
+      <ImageComponent />
+      <View style={[styles.container, isInverted && styles.invertedContainer]}>
+        <Text style={[styles.title, isInverted && styles.invertedTitle]}>
+          {t('faq1.title')}
+        </Text>
+        <Text style={[styles.subtitle, isInverted && styles.invertedSubtitle]}>
+          {t('faq1.subtitle')}
         </Text>
       </View>
-  
-      <TouchableOpacity
-      style={styles.Button}
-      onPress={() => navigation.goBack()}
-    >
-      <Text style={[styles.BTNtitle, { textAlign: 'center' }]}>Go Back</Text>
-    </TouchableOpacity>
+      <AdditionalContainer navigation={navigation} isInverted={isInverted} />
     </View>
   );
+};
 
-  const styles = StyleSheet.create({
-    scrollContainer: {
-      flexGrow: 1,
-    },
-    outerContainer: {
-      flex: 1,
-      backgroundColor: '#fff',
-      position: 'relative',
-    },
-    container: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#185c6b',
-      height: hp('10'),
-      borderBottomLeftRadius: 30,
-      borderBottomRightRadius: 30,
-      zIndex: 2, // Ensure this container is above the image
-      position: 'absolute', // Positioned relative to the outerContainer
-      top: 0,
-      left: 0,
-      right: 0,
-    },
-    title: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      color: 'white',
-    },
-    subtitle: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      color: 'tomato',
-    },
-    image: {
-      width: wp('100%'),
-      height: hp("30%"), // Adjust as needed
-      position: 'absolute',
-      bottom: hp(54), // Ensure image is positioned at the bottom
-      zIndex: 1, // Ensure image is below the main container
-    },
-    additionalContainer: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#FF5757',
-      height: hp(65),
-      paddingTop: 40,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
-      position: 'absolute', 
-      bottom: 0, 
-      left: 0, 
-      right: 0, 
-      zIndex: 3, 
-    },
-    additionalText: {
-      fontSize: 26,
-      marginTop: 35,
-      fontWeight: 'bold',
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
-      color: 'white',
-      top: -100,
-    },
-    textBox: {
-      backgroundColor: '#fff', // Light gray background
-      padding: 15,
-      borderRadius: 5,
-      marginBottom: 20, // Space between the box and the button
-      width: wp(85), 
-      top: -60,
-    },
-    bxTitle: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: '#333',
-      textAlign: 'justify',
-    },
-    bxContent: {
-      marginTop: 5,
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: '#333',
-    },
-    Button: {
-      width: wp(85),
-      top: -30,
-      backgroundColor: '#fff',
-      paddingVertical: 10,
-      borderRadius: 5,
-    },
-    BTNtitle: {
-      color: '#000',
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-      navButtonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: 'bold',
-      },
-      navButton2: {
-        marginTop: 10,
-        backgroundColor: '#fff',
-        paddingVertical: 10,
-        borderRadius: 5,
-        paddingHorizontal: 135,
-        top: -50,
-      },
-  });
+const ImageComponent = () => (
+  <Image
+    source={require('../../assets/images/FAQ-1.png')}
+    style={styles.image}
+  />
+);
 
-  export default AddInfo2;
+const AdditionalContainer = ({ navigation, isInverted }) => {
+  const { t } = useTranslation();
+
+  return (
+    <View style={[styles.additionalContainer, isInverted && styles.invertedAdditionalContainer]}>
+      <Text style={[styles.additionalText, isInverted && styles.invertedAdditionalText]}>
+        {t('faq1.raTitle')}
+      </Text>
+
+      <View style={[styles.textBox, isInverted && styles.invertedTextBox]}>
+        <Text style={[styles.bxTitle, isInverted && styles.invertedBxTitle]}>
+          {t('faq1.raDescription')}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={[styles.Button, isInverted && styles.invertedButton]}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={[styles.BTNtitle, { textAlign: 'center' }, isInverted && styles.invertedBTNtitle]}>
+          {t('faq1.goBackButton')}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    position: 'relative',
+  },
+  invertedOuterContainer: {
+    backgroundColor: '#000',
+  },
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#185c6b',
+    height: hp('10%'),
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    zIndex: 2,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  invertedContainer: {
+    backgroundColor: '#333',
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  invertedTitle: {
+    color: 'lightgray',
+  },
+  subtitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'tomato',
+  },
+  invertedSubtitle: {
+    color: '#02e3f7',
+  },
+  image: {
+    width: wp('100%'),
+    height: hp("30%"),
+    position: 'absolute',
+    bottom: hp(54),
+    zIndex: 1,
+  },
+  additionalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FF5757',
+    height: hp(65),
+    paddingTop: 40,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 3,
+  },
+  invertedAdditionalContainer: {
+    backgroundColor: '#444',
+  },
+  additionalText: {
+    fontSize: 26,
+    marginTop: 35,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    color: 'white',
+    top: -70,
+  },
+  invertedAdditionalText: {
+    color: '#02e3f7',
+  },
+  textBox: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 20,
+    width: wp(90),
+    top: -60,
+  },
+  invertedTextBox: {
+    backgroundColor: 'black',
+  },
+  bxTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'justify',
+  },
+  invertedBxTitle: {
+    color: 'white', // Adjust for inverted mode
+  },
+  Button: {
+    width: wp(87),
+    top: -30,
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  invertedButton: {
+    backgroundColor: '#000',
+  },
+  BTNtitle: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  invertedBTNtitle: {
+    color: 'white',
+  },
+});
+
+export default AddInfo2;

@@ -1,13 +1,15 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Image } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import sendOTP from "./sendOTP"; // Import your OTP sending function
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import { useTranslation } from "react-i18next"; // Import translation hook
 
 export default function SignUp({ navigation }) {
+  const { t } = useTranslation(); // Use the translation hook
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -27,14 +29,14 @@ export default function SignUp({ navigation }) {
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match!");
+      Alert.alert("Error", t("signUpPage.passwordLabel")); // Use translation for error message
       return;
     }
 
     try {
       // Check if email and password are provided
       if (!email || !password) {
-        throw new Error("Email and password are required.");
+        throw new Error(t("signUpPage.emailLabel") + " " + t("signUpPage.passwordLabel")); // Use translation for error message
       }
 
       // Generate a 6-digit OTP
@@ -57,7 +59,7 @@ export default function SignUp({ navigation }) {
       navigation.navigate("OTPVerification", { email, otp, password }); // Pass the password here
     } catch (error) {
       console.error("Sign-up error:", error.message);
-      Alert.alert("Sign-up Error", error.message);
+      Alert.alert(t("signUpPage.signUpText"), error.message); // Use translation for error message
     }
   };
 
@@ -74,21 +76,21 @@ export default function SignUp({ navigation }) {
         </Text>
 
         {/* Email Input */}
-        <Text style={styles.desc2}>Email</Text>
+        <Text style={styles.desc2}>{t("signUpPage.emailLabel")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your email"
+          placeholder={t("signUpPage.emailLabel")}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
 
         {/* Password Input */}
-        <Text style={styles.desc2}>Password</Text>
+        <Text style={styles.desc2}>{t("signUpPage.passwordLabel")}</Text>
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter your password"
+            placeholder={t("signUpPage.passwordLabel")}
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
@@ -103,11 +105,11 @@ export default function SignUp({ navigation }) {
         </View>
 
         {/* Confirm Password Input */}
-        <Text style={styles.desc2}>Confirm Password</Text>
+        <Text style={styles.desc2}>{t("signUpPage.confirmPasswordLabel")}</Text>
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Confirm your password"
+            placeholder={t("signUpPage.passwordLabel")}
             secureTextEntry={!showConfirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
@@ -121,20 +123,18 @@ export default function SignUp({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Button 
-          style={styles.BTNsu}
-          title="Sign Up"
-          onPress={handleSignUp}
-        />
+        {/* Sign Up Button */}
+        <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>{t("signUpPage.signUpButton")}</Text>
+        </TouchableOpacity>
+
         <Text style={styles.toggleText} onPress={() => navigation.navigate("Login")}>
-          Already have an account? Log In
+          {t("signUpPage.loginText")}
         </Text>
       </View>
     </View>
   );
 }
-
-// Add styles here...
 
 const styles = StyleSheet.create({
   container: {
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
     fontSize: 45,
     fontFamily: "outfit-bold",
     color: "#fff",
-    marginBottom: 10,
+    marginBottom: 5,
     marginTop: 0,
   },
   desc2: {
     fontSize: 12,
     fontFamily: "outfit-bold",
     color: "#fff",
-    marginBottom: 10,
+    marginBottom: 3,
     textAlign: "left",
     width: "80%",
   },
@@ -206,11 +206,22 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   toggleText: {
-    color: "#3498db",
+    color: "#fff",
     textAlign: "center",
+    fontWeight: 'bold',
+    marginTop: -2, // Adjusted margin to move it closer to the button
+  },
+  signUpButton: {
+    backgroundColor: "#FF5757",
+    borderRadius: 5,
+    padding: 10,
+    alignItems: "center",
+    width: "80%",
     marginBottom: 10,
   },
-  BTNsu: {
-    marginBottom: 30,
-  }
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });

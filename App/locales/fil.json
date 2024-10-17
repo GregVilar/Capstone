@@ -1,0 +1,130 @@
+{
+    "homeScreen": {
+      "title": "I-click ang Buton upang Isalin ang Wika ng App",
+      "welcomeMessage": "Ang Kasalukuyang Wika ay Filipino",
+      "header": "Isalin Ang App"
+    },
+    "loginPage": {
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "loginButton": "Mag-login",
+      "forgotPassword": "Nakalimutan ang Password?",
+      "signUpText": "Kailangan mo ng account? Mag-sign up",
+      "loading": "Nagloload..."
+    },
+    "forgotPasswordPage": {
+      "title": "I-reset ang",
+      "subtitle": "Password",
+      "enterEmail": "Ilagay ang iyong email",
+      "sendButton": "I-send sa Email",
+      "goBackButton": "Bumalik"
+    },
+    "signUpPage": {
+      "title": "Mag-sign Up",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Kumpirmahin ang Password",
+      "signUpButton": "Mag-sign Up",
+      "loginText": "May account ka na? Mag-login"
+    },
+    "otpVerification": {
+      "title": "Pahina ng",
+      "subtitle": "OTP",
+      "subtitle2": "Ilagay ang OTP na ipinadala sa {{email}}",
+      "verifyButton": "Kumpirmahin ang OTP",
+      "invalidOtp": "Di wastong OTP",
+      "invalidOtpMessage": "Ang OTP na iyong ipinasok ay mali.",
+      "success": "Tagumpay",
+      "userCreated": "Tagumpay sa paglikha ng user!",
+      "error": "Error",
+      "errorCreatingUser": "May naganap na error habang nililikha ang user.",
+      "passwordRequired": "Kinakailangan ang password."
+    },
+      "tts": {
+        "title": "Teksto sa Boses",
+        "placeholder": "Maglagay ng teksto",
+        "rate": "Bilis",
+        "pitch": "Tono",
+        "speakButton": "Magsalita",
+        "error": "Error",
+        "enterText": "Mangyaring ilagay ang teksto para magsalita."
+      },
+      "settings": {
+        "title": "Pahina ng mga",
+        "page": "Settings",
+        "settingsScreen": "Mga Setting na Screen",
+        "invertColors": "Baligtarin ang Mga Kulay",
+        "fontSize": "Sukat ng Font",
+        "increase": "Dagdagan",
+        "decrease": "Bawasan",
+        "currentFontSize": "Kasalukuyang Sukat ng Font"
+      },
+      "help": {
+        "title": "Pahina ng",
+        "subtitle": "Tulong",
+        "portal": "Portal ng Tulong",
+        "goToFAQ": "Pumunta sa FAQ",
+        "additionalInfo": "Karagdagang Impormasyon",
+        "hotline": "Hotline",
+        "ratingGuide": "Gabay sa Rating",
+        "photoGuide": "Gabay sa Larawan"
+      },
+  
+      "faq": {
+      "title": "Pahina ng",
+      "subtitle": "Tulong",
+      "faqTitle": "Madalas na Itanong",
+      "speechToTextQuestion": "Paano gamitin ang Speech-To-Text?",
+      "speechToTextAnswer": "Ganito gamitin ang Speech-To-Text...",
+      "goBackButton": "Bumalik"
+    },
+    "addInfo": {
+      "raTitle": "RA 7277 - Magna Carta para sa mga May Kapansanan",
+      "raDescription": "Isang batas na pinagtibay sa Pilipinas noong 1992. Layunin nito na itaguyod ang mga karapatan at kapakanan ng mga may kapansanan (PWD) sa pamamagitan ng pagbibigay ng pantay na oportunidad, access sa edukasyon, trabaho, pangkalusugan, at serbisyong panlipunan. Ipinag-uutos ng batas ang pagtanggal ng diskriminasyon laban sa PWDs at nagbibigay ng mga alituntunin para sa pamahalaan at pribadong sektor upang lumikha ng isang inclusive na kapaligiran.",
+      "moreInfo": "Karagdagang Impormasyon",
+      "goBack": "Bumalik"
+    },
+    "faq1": {
+      "title": "Pahina ng",
+      "subtitle": "Tulong",
+      "raTitle": "RA 344 - Accessibility Law",
+      "raDescription": "Isang batas na ipinatupad sa Pilipinas noong 1983 upang mapabuti ang mobilidad ng mga taong may kapansanan (PWDs) sa pamamagitan ng pag-require ng pag-install ng mga accessibility features sa mga pampublikong gusali, transportasyon, at imprastruktura. Ang batas ay nag-aatas na ang mga pasilidad tulad ng mga rampa, handrails, at elevator ay ibigay sa mga pampubliko at pribadong establisyimento upang matiyak na ang mga PWDs, matatanda, at iba pang may hamon sa mobilidad ay makakapasok sa mga espasyo nang ligtas at kumportable.",
+      "goBackButton": "Bumalik"
+    },
+    "larg": {
+      "title": "Pahina ng",
+      "subtitle": "Tulong",
+      "accessibilityRatingGuide": "Gabay sa Rating ng Accessibility ng Lokasyon",
+      "accessibleAllRooms": "Lahat ng silid ay maa-access gamit ang wheelchair at may kumpletong accessibility features (Ramps, ground level entrances, elevators)",
+      "accessibleSomeRooms": "Ang ilang silid ay maa-access gamit ang wheelchair at kulang sa accessibility features (Ramps, ground level entrances, elevators)",
+      "notAccessible": "Hindi maa-access",
+      "moreInfo": "Karagdagang Impormasyon",
+      "goBack": "Bumalik"
+    },
+    "larg2": {
+      "help": "Pahina ng",
+      "page": "Tulong",
+      "accessibilityRatingGuide": "Gabay sa Rating ng Accessibility ng Lokasyon",
+      "pictureInstructions": "Kapag kumukuha ng larawan, dapat makikita ang establisimiyento at sundin ang partikular na kilos ng kamay upang patunayan ang pagiging tunay.",
+      "goBack": "Bumalik"
+    },
+    "larg3": {
+      "title": "Pahina ng",
+      "subtitle": "Tulong",
+      "additionalText": "Patnubay sa Pag-rate ng Accessibility ng Lokasyon",
+      "goBack": "Bumalik"
+    },
+    "authScreen": {
+      "menu": "Menu",
+      "logout": "Mag-logout",
+      "home": "Bahay",
+      "forum": "Talakayan",
+      "favorite": "Paborito",
+      "profile": "Profile",
+      "tts": "Text-to-Speech",
+      "translate": "Isalin",
+      "help": "Tulong",
+      "settings": "Mga Setting"
+    }
+  }
+  

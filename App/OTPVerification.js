@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from "reac
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { auth, db } from "./FirebaseConfig"; // Adjust the path as needed
+import { useTranslation } from 'react-i18next'; // Import the translation hook
 
 export default function OTPVerification({ route, navigation }) {
   const { email, otp: expectedOtp, password } = route.params;
@@ -10,6 +11,8 @@ export default function OTPVerification({ route, navigation }) {
 
   // Refs to focus on the next input
   const inputRefs = useRef([]);
+  
+  const { t } = useTranslation(); // Initialize the translation hook
 
   const handleOtpChange = (text, index) => {
     if (text.length === 1) {
@@ -36,14 +39,14 @@ export default function OTPVerification({ route, navigation }) {
   const handleVerifyOtp = async () => {
     const otpEntered = otpArray.join("");
     if (otpEntered !== expectedOtp) {
-      Alert.alert("Invalid OTP", "The OTP you entered is incorrect.");
+      Alert.alert(t("otpVerification.invalidOtp"), t("otpVerification.invalidOtpMessage"));
       return;
     }
 
     try {
       // Ensure password is not empty
       if (!password) {
-        throw new Error("Password is required.");
+        throw new Error(t("otpVerification.passwordRequired"));
       }
 
       // Create the user after successful OTP verification
@@ -58,23 +61,23 @@ export default function OTPVerification({ route, navigation }) {
       });
 
       console.log("Document created successfully"); // Log success
-      Alert.alert("Success", "User created successfully!");
+      Alert.alert(t("otpVerification.success"), t("otpVerification.userCreated"));
       navigation.navigate("Login");
     } catch (error) {
       console.error("Error creating user:", error.message);
-      Alert.alert("Error", "An error occurred while creating the user.");
+      Alert.alert(t("otpVerification.error"), t("otpVerification.errorCreatingUser"));
     }
   };
 
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
-        <Text style={styles.title}>OTP</Text>
-        <Text style={styles.subtitle}>Page</Text>
+        <Text style={styles.title}>{t("otpVerification.title")}</Text>
+        <Text style={styles.subtitle}>{t("otpVerification.subtitle")}</Text>
       </View>
 
       <View style={styles.innerContainer}>
-        <Text style={styles.subtitle2}>Enter OTP sent to {email} {"\n"} </Text>
+        <Text style={styles.subtitle2}>{t("otpVerification.subtitle2", { email })} {"\n"} </Text>
         <View style={styles.otpContainer}>
           {otpArray.map((otp, index) => (
             <TextInput
@@ -89,7 +92,7 @@ export default function OTPVerification({ route, navigation }) {
           ))}
         </View>
         <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
-          <Text style={styles.buttonText}>Verify OTP</Text>
+          <Text style={styles.buttonText}>{t("otpVerification.verifyButton")}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -123,12 +126,14 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 30,
     fontWeight: 'bold',
+    textAlign: 'center',
     color: 'tomato',
   },
   subtitle2: {
     fontSize: 18,
     fontWeight: 'bold',
     color: 'tomato',
+    textAlign: 'center',
     marginBottom: 20,
   },
   innerContainer: {

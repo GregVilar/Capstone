@@ -5,15 +5,16 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '
 import { DrawerActions } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { auth } from './FirebaseConfig'; // Adjust path if needed
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './Home';
 import Favorites from './Favorites';
 import ForumStack from './ForumStack';
 import Translate from './Translate';
 import TTS from './TTS';
-import HelpStack from "./HelpStack";
+import HelpStack from './HelpStack';
 import Profile from './Profile';
 import SettingsScreen from './SettingsScreen';
+import { useTranslation } from 'react-i18next';
 
 // Handle Logout
 const handleLogout = async (navigation) => {
@@ -31,17 +32,20 @@ const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 function BottomTabs() {
+  const { t } = useTranslation();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
+          // Use static names for the route
           if (route.name === 'Home') {
             iconName = 'home-circle';
           } else if (route.name === 'Forum') {
             iconName = 'forum';
-          } else if (route.name === 'Favorite') {
+          } else if (route.name === 'Favorites') {
             iconName = 'heart';
           }
 
@@ -53,14 +57,29 @@ function BottomTabs() {
         tabBarLabelStyle: { fontFamily: 'outfit-bold', fontSize: 11 }
       })}
     >
-      <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Forum" component={ForumStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Favorite" component={Favorites} options={{ headerShown: false }} />
+      {/* Static screen names */}
+      <Tab.Screen 
+        name="Home" 
+        component={Home} 
+        options={{ headerShown: false, title: t('authScreen.home') }} 
+      />
+      <Tab.Screen 
+        name="Forum" 
+        component={ForumStack} 
+        options={{ headerShown: false, title: t('authScreen.forum') }} 
+      />
+      <Tab.Screen 
+        name="Favorites" 
+        component={Favorites} 
+        options={{ headerShown: false, title: t('authScreen.favorite') }} 
+      />
     </Tab.Navigator>
   );
 }
 
 export default function AuthenticatedScreen() {
+  const { t } = useTranslation();
+
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -76,27 +95,53 @@ export default function AuthenticatedScreen() {
         headerTintColor: '#fff',
       })}
     >
-      <Drawer.Screen name="PWDaan" component={BottomTabs} />
-      <Drawer.Screen name="Profile" component={Profile} />
-      <Drawer.Screen name="TTS" component={TTS} />
-      <Drawer.Screen name="Translate" component={Translate} />
-      <Drawer.Screen name="Help" component={HelpStack} />
-      <Drawer.Screen name="Settings" component={SettingsScreen} />
+      {/* Use static names for the screens */}
+      <Drawer.Screen 
+        name="HomeDrawer" 
+        component={BottomTabs} 
+        options={{ title: 'PWDaan' }} 
+      />
+      <Drawer.Screen 
+        name="Profile" 
+        component={Profile} 
+        options={{ title: t('authScreen.profile') }} 
+      />
+      <Drawer.Screen 
+        name="TTS" 
+        component={TTS} 
+        options={{ title: t('authScreen.tts') }} 
+      />
+      <Drawer.Screen 
+        name="Translate" 
+        component={Translate} 
+        options={{ title: t('authScreen.translate') }} 
+      />
+      <Drawer.Screen 
+        name="Help" 
+        component={HelpStack} 
+        options={{ title: t('authScreen.help') }} 
+      />
+      <Drawer.Screen 
+        name="Settings" 
+        component={SettingsScreen} 
+        options={{ title: t('authScreen.settings') }} 
+      />
     </Drawer.Navigator>
   );
 }
 
-// Custom Drawer Content Component
+// Custom Drawer Content
 const CustomDrawerContent = (props) => {
   const { navigation } = props;
+  const { t } = useTranslation();
 
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
-        <Text style={styles.drawerTitle}>Menu</Text>
+        <Text style={styles.drawerTitle}>{t('authScreen.menu')}</Text>
         <DrawerItemList {...props} />
         <TouchableOpacity style={styles.logoutButton} onPress={() => handleLogout(navigation)}>
-          <Text style={styles.logoutText}>Logout</Text>
+          <Text style={styles.logoutText}>{t('authScreen.logout')}</Text>
         </TouchableOpacity>
       </View>
     </DrawerContentScrollView>
@@ -104,15 +149,6 @@ const CustomDrawerContent = (props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   drawerContent: {
     flex: 1,
     justifyContent: 'space-between',
