@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Image, TouchableOpacity, Alert, Modal, TextInput, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, Button, Image, TouchableOpacity, Alert, Modal, TextInput, FlatList, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import { db } from '../FirebaseConfig'; // Import your Firebase config
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { collection, addDoc, onSnapshot, serverTimestamp, doc, deleteDoc, updateDoc, query, where, getDocs, getDoc  } from 'firebase/firestore';
@@ -18,7 +18,7 @@ const DiscussionGeneral = () => {
   const [fullViewModalVisible, setFullViewModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState('');
-const [editContent, setEditContent] = useState('');
+  const [editContent, setEditContent] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
@@ -27,6 +27,9 @@ const [editContent, setEditContent] = useState('');
   const [showOptions, setShowOptions] = useState(false); // New state for options visibility
   const [likesCount, setLikesCount] = useState(0); // Initialize to 0
   const [likedBy, setLikedBy] = useState([]); // Initialize to empty array
+  const [comments, setComments] = useState([]);
+  const [comment, setComment] = useState('');
+  const [expandedComments, setExpandedComments] = useState({});
 
 
 
@@ -61,6 +64,22 @@ const [editContent, setEditContent] = useState('');
     // Reset likesCount and likedBy when there's no selected discussion
     setLikesCount(0);
     setLikedBy([]);
+  }
+}, [selectedDiscussion]);
+
+useEffect(() => {
+  if (selectedDiscussion) {
+    const unsubscribeComments = onSnapshot(
+      collection(db, 'discussions', selectedDiscussion.id, 'comments'),
+      (snapshot) => {
+        const fetchedComments = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setComments(fetchedComments);
+      }
+    );
+    return () => unsubscribeComments(); // Cleanup on unmount or when selectedDiscussion changes
   }
 }, [selectedDiscussion]);
 
@@ -255,6 +274,87 @@ const [editContent, setEditContent] = useState('');
     }
   };
 
+// New function to submit a comment
+const handleSubmitComment = async () => {
+  if (!comment.trim()) {
+    Alert.alert('Error', 'Please enter a comment.');
+    return;
+  }
+
+  if (!currentUserId) {
+    Alert.alert('Error', 'You must be logged in to comment.');
+    return;
+  }
+
+  try {
+    // Retrieve user profile (including username)
+    const userDocRef = doc(db, 'users', currentUserId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      Alert.alert('Error', 'User profile not found.');
+      return;
+    }
+
+    const userData = userDoc.data();
+    const username = userData.username || 'Anonymous';
+
+    // Add comment to Firestore
+    await addDoc(collection(db, 'discussions', selectedDiscussion.id, 'comments'), {
+      text: comment,
+      createdAt: serverTimestamp(),
+      userId: currentUserId,
+      username: username,
+      likesCount: 0,
+      likedBy: [],
+    });
+
+    setComment(''); // Clear the comment input
+  } catch (error) {
+    Alert.alert('Error', `Error adding comment: ${error.message}`);
+  }
+};
+
+// Function to like/unlike a comment
+const handleLikeComment = async (commentId, commentLikesCount, commentLikedBy) => {
+  if (!currentUserId) {
+    Alert.alert('Error', 'You must be logged in to like a comment.');
+    return;
+  }
+
+  let updatedLikedBy = [...commentLikedBy];
+  let updatedLikesCount = commentLikesCount;
+
+  if (updatedLikedBy.includes(currentUserId)) {
+    // Unlike
+    updatedLikedBy = updatedLikedBy.filter(userId => userId !== currentUserId);
+    updatedLikesCount--;
+  } else {
+    // Like
+    updatedLikedBy.push(currentUserId);
+    updatedLikesCount++;
+  }
+
+  try {
+    await updateDoc(doc(db, 'discussions', selectedDiscussion.id, 'comments', commentId), {
+      likesCount: updatedLikesCount,
+      likedBy: updatedLikedBy,
+    });
+  } catch (error) {
+    Alert.alert('Error', `Failed to update comment like: ${error.message}`);
+  }
+};
+
+// Function to toggle "View More" for comments
+const toggleExpandComment = (commentId) => {
+  setExpandedComments(prevState => ({
+    ...prevState,
+    [commentId]: !prevState[commentId]
+  }));
+};
+
+
+
   return (
     <View style={styles.outerContainer}>
       <ImageComponent />
@@ -280,6 +380,7 @@ const [editContent, setEditContent] = useState('');
             <TextInput
               placeholder="Enter Title"
               value={title}
+              maxLength={50}
               onChangeText={setTitle}
               style={styles.input}
             />
@@ -288,6 +389,7 @@ const [editContent, setEditContent] = useState('');
               placeholder="Enter Content"
               value={content}
               onChangeText={setContent}
+              maxLength={255}
               style={[styles.input, { height: 100 }]}
               multiline={true}
             />
@@ -317,66 +419,126 @@ const [editContent, setEditContent] = useState('');
 
   <View style={styles.fullViewContent}>
     <View style={styles.threadContainerModal}>
-      {selectedDiscussion && !editMode ? (
-        <>
-          <Text style={styles.fullViewTitle}>{selectedDiscussion.title}</Text>
-          <Text style={styles.fullViewContentText}>{selectedDiscussion.content}</Text>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}
+      showsVerticalScrollIndicator={false} // Hide the vertical scrollbar
+      >
+        {selectedDiscussion && !editMode ? (
+          <>
+            {/* Discussion Content */}
+            <Text style={styles.fullViewTitle}>{selectedDiscussion.title}</Text>
+            <Text style={styles.fullViewContentText}>{selectedDiscussion.content}</Text>
 
-         {/* Like System */}
-<View style={styles.likeContainer}>
-  <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
-    <Like name={likedBy.includes(currentUserId) ? 'heart' : 'hearto'} size={24} color={likedBy.includes(currentUserId) ? 'red' : 'black'} />
-  </TouchableOpacity>
-  <Text>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</Text>
-</View>
-            
-            
-          
-
-          {/* Show the 3-dot icon and dropdown menu if the current user is the owner */}
-          {auth.currentUser.uid === selectedDiscussion.userId && (
-            <View style={styles.optionsContainer}>
-              {/* 3-Dot Icon for showing options */}
-              <More name="more-horizontal" size={36} onPress={() => setShowOptions(!showOptions)} />
-
-              {/* Dropdown menu with Edit and Delete options */}
-              {showOptions && (
-                <View style={styles.dropdownMenu}>
-                  <TouchableOpacity onPress={() => { setEditMode(true); setShowOptions(false); }}>
-                    <Edit name="edit" style={styles.edtbutton} />
-                    <Text style={styles.dropdownMenuItemText}>Edit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleDelete(selectedDiscussion.id, selectedDiscussion.userId)}>
-                    <Icons name="delete" style={styles.deleteButtonText} />
-                    <Text style={styles.dropdownMenuItemText}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+            {/* Like System */}
+            <View style={styles.likeContainer}>
+              <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+                <Like 
+                  name={likedBy.includes(currentUserId) ? 'heart' : 'hearto'} 
+                  size={24} 
+                  color={likedBy.includes(currentUserId) ? 'red' : 'black'} 
+                />
+              </TouchableOpacity>
+              <Text>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</Text>
             </View>
-          )}
-        </>
-      ) : (
-        <>
-          {/* Edit Mode */}
-          <TextInput
-            value={editTitle}
-            onChangeText={setEditTitle}
-            style={styles.input}
-            placeholder="Edit Title"
-          />
-          <TextInput
-            value={editContent}
-            onChangeText={setEditContent}
-            style={[styles.input, { height: 100 }]}
-            placeholder="Edit Content"
-            multiline={true}
-          />
-          <View style={styles.buttonGroup}>
-            <Button title="Save" onPress={handleSaveEdit} />
-            <Button title="Cancel" color="red" onPress={() => setEditMode(false)} />
-          </View>
-        </>
-      )}
+
+            {/* Show the 3-dot icon and dropdown menu if the current user is the owner */}
+            {auth.currentUser.uid === selectedDiscussion.userId && (
+              <View style={styles.optionsContainer}>
+                <More name="more-horizontal" size={36} onPress={() => setShowOptions(!showOptions)} />
+                {showOptions && (
+                  <View style={styles.dropdownMenu}>
+                    <TouchableOpacity onPress={() => { setEditMode(true); setShowOptions(false); }}>
+                      <Edit name="edit" style={styles.edtbutton} />
+                      <Text style={styles.dropdownMenuItemText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleDelete(selectedDiscussion.id, selectedDiscussion.userId)}>
+                      <Icons name="delete" style={styles.deleteButtonText} />
+                      <Text style={styles.dropdownMenuItemText}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Comment Section */}
+            <View style={styles.commentSection}>
+              {/* Comment Input */}
+              <TextInput
+                value={comment}
+                onChangeText={setComment}
+                placeholder="Write a comment..."
+                maxLength={255}
+                style={styles.commentInput}
+                multiline={true}
+              />
+              <TouchableOpacity onPress={handleSubmitComment} style={styles.submitCommentButton}>
+                <Text style={styles.submitCommentButtonText}>Submit Comment</Text>
+              </TouchableOpacity>
+
+              {/* Display Comments */}
+              <FlatList
+                data={comments}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => {
+                  const isCommentExpanded = expandedComments[item.id];
+                  const commentText = isCommentExpanded || item.text.length <= 100
+                    ? item.text
+                    : item.text.slice(0, 100) + '...';
+
+                  return (
+                    <View style={styles.commentContainer}>
+                      <Text style={styles.commentUsername}>{item.username}</Text>
+                      <Text style={styles.commentText}>
+                        {commentText}
+                        {item.text.length > 100 && (
+                          <Text
+                            onPress={() => toggleExpandComment(item.id)}
+                            style={styles.viewMoreText}
+                          >
+                            {isCommentExpanded ? ' View Less' : ' View More'}
+                          </Text>
+                        )}
+                      </Text>
+
+                      {/* Comment Like System */}
+                      <View style={styles.commentLikeContainer}>
+                        <TouchableOpacity onPress={() => handleLikeComment(item.id, item.likesCount, item.likedBy)}>
+                          <Like
+                            name={item.likedBy.includes(currentUserId) ? 'heart' : 'hearto'}
+                            size={20}
+                            color={item.likedBy.includes(currentUserId) ? 'red' : 'black'}
+                          />
+                        </TouchableOpacity>
+                        <Text style={styles.commentLikesText}>{item.likesCount} {item.likesCount === 1 ? 'Like' : 'Likes'}</Text>
+                      </View>
+                    </View>
+                  );
+                }}
+              />
+            </View>
+          </>
+        ) : (
+          <>
+            {/* Edit Mode */}
+            <TextInput
+              value={editTitle}
+              onChangeText={setEditTitle}
+              style={styles.input}
+              placeholder="Edit Title"
+            />
+            <TextInput
+              value={editContent}
+              onChangeText={setEditContent}
+              style={[styles.input, { height: 100 }]}
+              placeholder="Edit Content"
+              multiline={true}
+            />
+            <View style={styles.buttonGroup}>
+              <Button title="Save" onPress={handleSaveEdit} />
+              <Button title="Cancel" color="red" onPress={() => setEditMode(false)} />
+            </View>
+          </>
+        )}
+      </ScrollView>
     </View>
   </View>
 </Modal>
@@ -401,9 +563,7 @@ const AdditionalContainer = ({ discussions, onDiscussionPress, currentUserId }) 
         const createdAt = item.createdAt?.toDate();
         const formattedDate = createdAt ? createdAt.toLocaleString() : "Unknown";
 
-        console.log('Current User ID:', currentUserId);
-        console.log('Post User ID:', item.userId);
-
+    
         return (
           <View style={styles.threadContainer}>
             <TouchableOpacity onPress={() => onDiscussionPress(item)} style={styles.discussionItem}>
@@ -426,6 +586,56 @@ const AdditionalContainer = ({ discussions, onDiscussionPress, currentUserId }) 
 
 // Styles
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    paddingVertical: 10, // Space around the scrollable content
+  },
+
+  commentSection: {
+    marginTop: 20,
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    backgroundColor: '#FFF',
+  },
+  submitCommentButton: {
+    backgroundColor: '#185c6b',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  submitCommentButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  commentContainer: {
+    backgroundColor: '#F0F0F0',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  commentUsername: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  commentText: {
+    marginBottom: 5,
+  },
+  viewMoreText: {
+    color: 'blue',
+  },
+  commentLikeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  commentLikesText: {
+    marginLeft: 5,
+  },
+  
   fullViewModalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -468,13 +678,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   fullViewContent: {
-    width: wp('90%'),
+    width: wp('100%'),
     height: hp('60%'),
     backgroundColor: '#FF5757',
     borderRadius: 20,
     padding: 30,
-    marginBottom:70,
-    marginLeft:20,
+    marginBottom:50,
+    marginLeft:0,
     
   },
   fullViewTitle: {
@@ -650,13 +860,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF7F7',
     padding: 20,
     borderRadius: 2,
-    width: wp('90%'), 
+    width: wp('85%'), 
     height: hp('35%'), 
     overflow: 'visible', 
-    bottom:10,
-    left:-30,
-
+    marginBottom:20,
   },
+  threadContainerModalComments: {
+    justifyContent:"center",
+    alignContent:"center",
+    backgroundColor: '#FFF7F7',
+    padding: 20,
+    borderRadius: 2,
+    width: wp('85%'), 
+    height: hp('15%'), 
+    overflow: 'visible', 
+  },
+  
   textDiscussHeader: {
     fontWeight: 'bold',
     fontSize: 16,
