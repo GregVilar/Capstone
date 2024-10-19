@@ -39,6 +39,11 @@ export default function Favorites() {
     }
   }, [user, db]); // Re-run this effect if user or db changes
 
+  // Function to check if the place is favorited
+  const isFav = (place) => {
+    return favList.some((item) => item.place.id === place.id); // Check if place is in favList
+  };
+
   return (
     <View style={styles.container}>
       {loading ? ( // Show loader when loading
@@ -51,7 +56,7 @@ export default function Favorites() {
           onRefresh={() => setLoading(true)} // Optional: Set loading to true on manual refresh
           refreshing={loading}
           renderItem={({ item }) => (
-            <PlaceItem place={item.place} isFav={true} markedFav={() => {}} />
+            <PlaceItem place={item.place} isFav={isFav(item.place)} markedFav={() => {}} />
           )}
           keyExtractor={(item, index) => index.toString()} // Add a key extractor if needed
         />

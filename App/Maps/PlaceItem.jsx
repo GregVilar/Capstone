@@ -33,24 +33,34 @@ export default function PlaceItem({ place, isFav, markedFav }) {
       return;
     }
 
-    await setDoc(doc(db, "fav-place", place.id.toString()), {
-      place: place,
-      email: user.email
-    });
-    markedFav(); // Call to update the favorite state in parent component
-    ToastAndroid.show('Fav Added!', ToastAndroid.TOP);
+    try {
+      await setDoc(doc(db, "fav-place", place.id.toString()), {
+        place: place,
+        email: user.email,
+      });
+      markedFav(); // Call to update the favorite state in parent component
+      ToastAndroid.show('Fav Added!', ToastAndroid.TOP);
+    } catch (error) {
+      console.error("Error adding favorite:", error);
+      ToastAndroid.show('Failed to add favorite', ToastAndroid.TOP);
+    }
   };
 
   // Function to remove a place from favorites
-  const onRemoveFav = async (placeId) => {
+  const onRemoveFav = async () => {
     if (!user) {
       ToastAndroid.show('User not authenticated', ToastAndroid.TOP);
       return;
     }
 
-    await deleteDoc(doc(db, "fav-place", placeId.toString()));
-    markedFav(); // Call to update the favorite state in parent component
-    ToastAndroid.show('Fav Removed!', ToastAndroid.TOP);
+    try {
+      await deleteDoc(doc(db, "fav-place", place.id.toString()));
+      markedFav(); // Call to update the favorite state in parent component
+      ToastAndroid.show('Fav Removed!', ToastAndroid.TOP);
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+      ToastAndroid.show('Failed to remove favorite', ToastAndroid.TOP);
+    }
   };
 
   return (
@@ -73,20 +83,11 @@ export default function PlaceItem({ place, isFav, markedFav }) {
         }}
       />
 
-      {/* Favorite Icon - Toggle between add/remove favorite */}
-      {!isFav ? (
-        <Pressable
-          style={{ position: 'absolute', left: 0, margin: 5, zIndex: 2 }}
-          onPress={onSetFav}>
-          <Ionicons name="heart-outline" size={30} color="black" />
-        </Pressable>
-      ) : (
-        <Pressable
-          style={{ position: 'absolute', left: 0, margin: 5, zIndex: 2 }}
-          onPress={() => onRemoveFav(place.id)}>
-          <Ionicons name="heart-sharp" size={30} color="red" />
-        </Pressable>
-      )}
+      <Pressable
+        style={{ position: 'absolute', left: 0, margin: 5, zIndex: 2 }}
+        onPress={isFav ? onRemoveFav : onSetFav}>
+        <Ionicons name={isFav ? "heart-sharp" : "heart-outline"} size={30} color={isFav ? "red" : "black"} />
+      </Pressable>
 
       {/* Image of the place */}
       <Image
@@ -107,9 +108,9 @@ export default function PlaceItem({ place, isFav, markedFav }) {
 
       {/* Place information */}
       <View style={{ padding: 15, fontSize: 23 }}>
-        <Text>{place.displayName?.text}</Text>
+        <Text>{place.displayName?.text || "No name available"}</Text>
         <Text style={{ fontSize: 12, color: 'gray' }}>
-          {place?.shortFormattedAddress}
+          {place?.shortFormattedAddress || "No address available"}
         </Text>
       </View>
     </View>

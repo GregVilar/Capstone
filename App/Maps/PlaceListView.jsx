@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import PlaceItem from './PlaceItem';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SelectMarkerContext } from './SelectedMarkerContext';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, onSnapshot} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Firebase Auth import
 import { app } from '../FirebaseConfig';
 
@@ -34,21 +34,33 @@ export default function PlaceListView({ placeList, onMinimize }) {
     }, [user]);
 
     // Fetch favorite places for the authenticated user
-    const getFav = async () => { 
+    const getFav = () => { 
         if (!user) {
             console.log('No user is authenticated.');
             return;
         }
-        setFavList([]);
-        const q = query(collection(db, "fav-place"), 
-        where("email", "==", user.email)); // Use Firebase user's email
-
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
-            setFavList(favList => [...favList, doc.data()]);
+    
+        const q = query(collection(db, "fav-place"), where("email", "==", user.email));
+        
+        // Listen for real-time updates
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const favorites = [];
+            querySnapshot.forEach((doc) => {
+                favorites.push(doc.data());
+            });
+            setFavList(favorites); // Update favList with real-time data
         });
+    
+        // Return unsubscribe function to cleanup on unmount
+        return unsubscribe;
     };
+
+    useEffect(() => {
+        if (user) {
+            const unsubscribe = getFav();  // Call getFav() only when user is available
+            return () => unsubscribe(); // Cleanup the listener
+        }
+    }, [user]);
 
     const getItemLayout = (_, index) => ({
         length: Dimensions.get('window').width,
@@ -70,6 +82,7 @@ export default function PlaceListView({ placeList, onMinimize }) {
         const result = favList.find(item => item.place.id == place.id);
         return result ? true : false;
     };
+    
 
     return (
         <View style={styles.container}>

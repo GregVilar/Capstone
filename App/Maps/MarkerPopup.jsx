@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Image, TextInput } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import GlobalApi from '../../assets/util/GlobalApi';
@@ -50,63 +50,58 @@ const MarkerPopup = ({ visible, onClose, place }) => {
 
     const submitRating = async (placeId) => { 
         console.log('Submitting rating...');
-    
+
         if (!selectedImageUri) {
             console.error('No image selected');
             return;
         }
-    
+
         const userId = auth.currentUser ? auth.currentUser.uid : null;
-    
+
         if (!userId) {
             console.error('User ID is undefined');
             return;
         }
-    
+
         if (!comment.trim()) {
             alert('Comment is required!');
             return;
         }
-    
+
         if (!accessibility) {
             alert('Please select an accessibility option!');
             return;
         }
-    
+
         try {
-            
             const existingRatingDoc = await getDoc(doc(getFirestore(), "ratings", `${placeId}_${userId}`));
-    
+
             if (existingRatingDoc.exists()) {
                 alert('You have already submitted a rating for this location.');
                 closeRatingModal();
                 return; 
             }
-    
-            const userDoc = await getDoc(doc(getFirestore(), "users", userId));
-            const username = userDoc.exists() ? userDoc.data().username : "anonymous";
-    
+
             const response = await fetch(selectedImageUri);
             const blob = await response.blob();
-    
+
             const storage = getStorage();
             const storageRef = ref(storage, `images/${userId}/${Date.now()}.jpg`);
-    
+
             await uploadBytes(storageRef, blob);
             const downloadURL = await getDownloadURL(storageRef);
-    
+
             const db = getFirestore();
             
             await setDoc(doc(db, "ratings", `${placeId}_${userId}`), {
                 imageUrl: downloadURL,
                 userId: userId,
-                username: username,
                 comment: comment,
                 accessibility: accessibility,
                 placeId: placeId, 
                 createdAt: new Date(),
             });
-    
+
             console.log('Image uploaded and rating saved successfully');
             setComment('');
             setAccessibility(null);
@@ -114,11 +109,9 @@ const MarkerPopup = ({ visible, onClose, place }) => {
         } catch (error) {
             console.error('Error uploading image or saving rating:', error);
         }
-    
+
         closeRatingModal();
     };
-    
-
 
     return (
         <Modal
@@ -203,7 +196,6 @@ const MarkerPopup = ({ visible, onClose, place }) => {
                             />
                         </TouchableOpacity>
 
-
                         <TouchableOpacity
                             onPress={() => {
                                 closeRatingModal();
@@ -226,14 +218,12 @@ const MarkerPopup = ({ visible, onClose, place }) => {
                         value={comment} // Binds TextInput value to comment state
                     />
 
-
                     <TouchableOpacity
                         style={styles.submitRatingButton}
                         onPress={() => submitRating(place.id)} // Pass place.id here
                     >
                         <Text style={styles.buttonText}>Submit Rating</Text>
                     </TouchableOpacity>
-
 
                     <TouchableOpacity
                         style={styles.uploadButton}
