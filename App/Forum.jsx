@@ -18,14 +18,6 @@ const Forum = () => {
       <TouchableOpacity onPress={() => navigation.navigate('DiscussionLandmarks')}>
         <DiscussionLandmarks />
       </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.navigate('DiscussionGeneral1')}>
-        <DiscussionGeneral1 />
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.navigate('DiscussionLandmarks1')}>
-        <DiscussionLandmarks1 />
-      </TouchableOpacity>
     </View>
   );
 };

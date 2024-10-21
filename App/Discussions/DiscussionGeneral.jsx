@@ -8,6 +8,7 @@ import Icons from 'react-native-vector-icons/AntDesign';
 import Edit from 'react-native-vector-icons/FontAwesome5';
 import More from'react-native-vector-icons/Feather';
 import Like from 'react-native-vector-icons/AntDesign';
+import Send from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const POSTS_PER_MONTH_LIMIT = 10;
@@ -22,14 +23,19 @@ const DiscussionGeneral = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null); // Store current user's ID
-  const auth = getAuth(); // Initialize Firebase Auth
-  const [showOptions, setShowOptions] = useState(false); // New state for options visibility
-  const [likesCount, setLikesCount] = useState(0); // Initialize to 0
-  const [likedBy, setLikedBy] = useState([]); // Initialize to empty array
+  const [currentUserId, setCurrentUserId] = useState(null); 
+  const auth = getAuth();
+  const [showOptions, setShowOptions] = useState(false); 
+  const [likesCount, setLikesCount] = useState(0); 
+  const [likedBy, setLikedBy] = useState([]);
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
   const [expandedComments, setExpandedComments] = useState({});
+  const [selectedCommentId, setSelectedCommentId] = useState(null);
+  const [commentEditMode, setCommentEditMode] = useState(false);
+  const [editingComments, setEditingComments] = useState({});
+
+
 
 
 
@@ -67,7 +73,7 @@ const DiscussionGeneral = () => {
   }
 }, [selectedDiscussion]);
 
-useEffect(() => {
+  useEffect(() => {
   if (selectedDiscussion) {
     const unsubscribeComments = onSnapshot(
       collection(db, 'discussions', selectedDiscussion.id, 'comments'),
@@ -173,10 +179,13 @@ useEffect(() => {
           onPress: () => {
             deleteDoc(doc(db, 'discussions', id))
               .then(() => {
+                
                 Alert.alert('Discussion deleted successfully');
+                
               })
               .catch(error => {
                 Alert.alert('Error', `Failed to delete discussion: ${error.message}`);
+                
               });
           },
           style: "destructive",
@@ -184,6 +193,8 @@ useEffect(() => {
       ]
     );
     setShowOptions(false);
+    setFullViewModalVisible(false); // Ensure this is the correct modal state
+
 
   };
 
@@ -353,7 +364,76 @@ const toggleExpandComment = (commentId) => {
   }));
 };
 
+// Function to handle comment deletion
+const handleDeleteComment = (commentId, commentUserId) => {
+  if (!currentUserId) {
+    Alert.alert("Error", "You must be logged in to delete a comment.");
+    return;
+  }
 
+  if (currentUserId !== commentUserId) {
+    Alert.alert("Unauthorized", "You can only delete your own comment.");
+    return;
+  }
+
+  Alert.alert(
+    "Delete Comment",
+    "Are you sure you want to delete this comment?",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        onPress: () => {
+          deleteDoc(doc(db, 'discussions', selectedDiscussion.id, 'comments', commentId))
+            .then(() => {
+              Alert.alert('Comment deleted successfully');
+            })
+            .catch((error) => {
+              Alert.alert('Error', `Failed to delete comment: ${error.message}`);
+            });
+        },
+        style: "destructive",
+      },
+    ]
+  );
+};
+
+
+// Function to enable editing of a comment
+const handleEditComment = (commentId, commentText) => {
+  setEditingComments(prevState => ({
+    ...prevState,
+    [commentId]: commentText,  // Keep track of the comment being edited
+  }));
+  setCommentEditMode(true); // Enable comment edit mode
+  setSelectedCommentId(commentId); // Track the specific comment being edited
+};
+
+// Function to save the edited comment
+const handleSaveEditComment = async (commentId) => {
+  const updatedCommentText = editingComments[commentId]; // Get the edited text for this comment
+
+  if (commentId && updatedCommentText.trim()) {
+    try {
+      await updateDoc(doc(db, 'discussions', selectedDiscussion.id, 'comments', commentId), {
+        text: updatedCommentText,
+        updatedAt: serverTimestamp(),
+      });
+      Alert.alert('Comment Updated');
+      setEditingComments(prevState => {
+        const newState = { ...prevState };
+        delete newState[commentId];  // Clear the editing state for this comment after saving
+        return newState;
+      });
+      setCommentEditMode(false);
+      setSelectedCommentId(null);
+    } catch (error) {
+      Alert.alert('Error', `Failed to update comment: ${error.message}`);
+    }
+  } else {
+    Alert.alert('Error', 'Please fill out the comment.');
+  }
+};
 
   return (
     <View style={styles.outerContainer}>
@@ -389,7 +469,7 @@ const toggleExpandComment = (commentId) => {
               placeholder="Enter Content"
               value={content}
               onChangeText={setContent}
-              maxLength={255}
+              maxLength={125}
               style={[styles.input, { height: 100 }]}
               multiline={true}
             />
@@ -420,7 +500,7 @@ const toggleExpandComment = (commentId) => {
   <View style={styles.fullViewContent}>
     <View style={styles.threadContainerModal}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}
-      showsVerticalScrollIndicator={false} // Hide the vertical scrollbar
+      showsVerticalScrollIndicator={false} 
       >
         {selectedDiscussion && !editMode ? (
           <>
@@ -461,59 +541,20 @@ const toggleExpandComment = (commentId) => {
 
             {/* Comment Section */}
             <View style={styles.commentSection}>
+            <View style={styles.commentInputContainer}>
               {/* Comment Input */}
               <TextInput
                 value={comment}
                 onChangeText={setComment}
                 placeholder="Write a comment..."
-                maxLength={255}
+                maxLength={100}
                 style={styles.commentInput}
                 multiline={true}
               />
-              <TouchableOpacity onPress={handleSubmitComment} style={styles.submitCommentButton}>
-                <Text style={styles.submitCommentButtonText}>Submit Comment</Text>
+              <TouchableOpacity onPress={handleSubmitComment}>
+                <Send name="send-circle" size={36}  style={styles.submitCommentButton}/>
               </TouchableOpacity>
-
-              {/* Display Comments */}
-              <FlatList
-                data={comments}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => {
-                  const isCommentExpanded = expandedComments[item.id];
-                  const commentText = isCommentExpanded || item.text.length <= 100
-                    ? item.text
-                    : item.text.slice(0, 100) + '...';
-
-                  return (
-                    <View style={styles.commentContainer}>
-                      <Text style={styles.commentUsername}>{item.username}</Text>
-                      <Text style={styles.commentText}>
-                        {commentText}
-                        {item.text.length > 100 && (
-                          <Text
-                            onPress={() => toggleExpandComment(item.id)}
-                            style={styles.viewMoreText}
-                          >
-                            {isCommentExpanded ? ' View Less' : ' View More'}
-                          </Text>
-                        )}
-                      </Text>
-
-                      {/* Comment Like System */}
-                      <View style={styles.commentLikeContainer}>
-                        <TouchableOpacity onPress={() => handleLikeComment(item.id, item.likesCount, item.likedBy)}>
-                          <Like
-                            name={item.likedBy.includes(currentUserId) ? 'heart' : 'hearto'}
-                            size={20}
-                            color={item.likedBy.includes(currentUserId) ? 'red' : 'black'}
-                          />
-                        </TouchableOpacity>
-                        <Text style={styles.commentLikesText}>{item.likesCount} {item.likesCount === 1 ? 'Like' : 'Likes'}</Text>
-                      </View>
-                    </View>
-                  );
-                }}
-              />
+              </View>
             </View>
           </>
         ) : (
@@ -540,10 +581,116 @@ const toggleExpandComment = (commentId) => {
         )}
       </ScrollView>
     </View>
-  </View>
-</Modal>
+    <View style={styles.threadContainerModalComments}>
+  {/* Display Comments */}
+  <FlatList
+    data={comments}
+    keyExtractor={item => item.id}
+    renderItem={({ item }) => {
+      const isCommentExpanded = expandedComments[item.id];
+      const commentText =
+        isCommentExpanded || item.text.length <= 100
+          ? item.text
+          : item.text.slice(0, 100) + '...';
 
-    </View>
+      return (
+        <View style={styles.commentContainer} key={item.id}>
+          <Text style={styles.commentUsername}>{item.username}</Text>
+
+          {/* Conditionally render the comment or an input field for editing */}
+          {commentEditMode && selectedCommentId === item.id ? (
+            <>
+              <TextInput
+                value={editingComments[item.id] || ''}
+                onChangeText={text =>
+                  setEditingComments(prevState => ({
+                    ...prevState,
+                    [item.id]: text, // Update the text for the specific comment being edited
+                  }))
+                }
+                style={styles.commentEditInput}
+              />
+              <Button
+              style={styles.submitCommentButton}
+                title="Save"
+                onPress={() => handleSaveEditComment(item.id)}
+              />
+            </>
+          ) : (
+            <Text style={styles.commentText}>
+              {commentText}
+              {item.text.length > 100 && (
+                <Text
+                  onPress={() => toggleExpandComment(item.id)}
+                  style={styles.viewMoreText}
+                >
+                  {isCommentExpanded ? ' View Less' : ' View More'}
+                </Text>
+              )}
+            </Text>
+          )}
+
+          {/* Comment Like System */}
+          <View style={styles.commentLikeContainer}>
+            <TouchableOpacity
+              onPress={() =>
+                handleLikeComment(item.id, item.likesCount, item.likedBy)
+              }
+            >
+              <Like
+                name={item.likedBy.includes(currentUserId) ? 'heart' : 'hearto'}
+                size={20}
+                color={item.likedBy.includes(currentUserId) ? 'red' : 'black'}
+              />
+            </TouchableOpacity>
+            <Text style={styles.commentLikesText}>
+              {item.likesCount} {item.likesCount === 1 ? 'Like' : 'Likes'}
+            </Text>
+          </View>
+
+          {/* Show the 3-dot icon and dropdown menu if the current user is the owner of the comment */}
+          {auth.currentUser.uid === item.userId && (
+            <View style={styles.commentOptionsContainer}>
+              <More
+                name="more-horizontal"
+                size={24}
+                onPress={() =>
+                  setShowOptions((prevOptions) => ({
+                    ...prevOptions,
+                    [item.id]: !prevOptions[item.id],
+                  }))
+                }
+              />
+              {showOptions[item.id] && (
+                <View style={styles.commentDropdownMenu}>
+                  <TouchableOpacity
+                    onPress={() => handleEditComment(item.id, item.text)}
+                    style={styles.commentDropdownMenuItem}
+                  >
+                    <Edit name="edit" style={styles.commentEditButton} size={24} />
+                    <Text style={styles.commentDropdownMenuItemText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteComment(item.id, item.userId)}
+                    style={styles.commentDropdownMenuItem}
+                  >
+                    <Icons name="delete" style={styles.commentDeleteButtonText} size={24} />
+                    <Text style={styles.commentDropdownMenuItemText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+      );
+    }}
+  />
+</View>
+
+        </View>
+          </Modal>
+
+             </View>
   );
 };
 
@@ -593,20 +740,26 @@ const styles = StyleSheet.create({
   commentSection: {
     marginTop: 20,
   },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'white',
+    borderRadius: 5,
+   
+   
+  },
   commentInput: {
     borderWidth: 1,
-    borderColor: '#ccc',
     padding: 10,
     borderRadius: 5,
-    marginBottom: 10,
     backgroundColor: '#FFF',
+    flex: 1,
+    paddingVertical: 10,
   },
   submitCommentButton: {
-    backgroundColor: '#185c6b',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
+   color:'#185c6b',
+
   },
   submitCommentButtonText: {
     color: '#FFF',
@@ -647,22 +800,36 @@ const styles = StyleSheet.create({
     marginBottom:20,
     fontSize: 12,
   },
+  commentDropdownMenuItemText:{
+    color: 'black', // White text
+    fontSize: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   dropdownMenu: {
     position: 'absolute',
-    top: 30,
-    right: 10,
-    backgroundColor: '00FFFFFF',
+    top: 25,
+    right: -0,
+    backgroundColor: '#FFF7F7',
     paddingTop:20,
     borderRadius: 8, 
     justifyContent: 'center',
     alignItems: 'center',
     
   },
+  commentDropdownMenu:{
+    marginLeft:'50',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    overflow:'visible',
+    paddingHorizontal:'50',
+  },
   
   optionsContainer: {
     position: 'absolute',
-    top: 10,
+    top: -10,
     right: 10,
+   
   },
   modalBackground: {
     position: 'absolute',
@@ -670,6 +837,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    width: wp('100%'),
+    height: hp('100%'),
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Greyed area
   },
   textDiscussDate: {
@@ -679,7 +848,7 @@ const styles = StyleSheet.create({
   },
   fullViewContent: {
     width: wp('100%'),
-    height: hp('60%'),
+    height: hp('72%'),
     backgroundColor: '#FF5757',
     borderRadius: 20,
     padding: 30,
@@ -713,7 +882,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#185c6b',
-    padding: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     position: 'absolute',
@@ -729,12 +897,12 @@ const styles = StyleSheet.create({
 
   },
   title: {
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: 'bold',
     color: 'white',
   },
   subtitle: {
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: 'bold',
     color: 'tomato',
   },
@@ -742,7 +910,7 @@ const styles = StyleSheet.create({
     width: wp('100%'),
     height: hp('20%'),
     position: 'absolute',
-    bottom: 500,
+    bottom: 520,
     zIndex: 1,
   },
   additionalContainer: {
@@ -761,7 +929,6 @@ const styles = StyleSheet.create({
  
   deleteButtonText: {
     fontSize: wp('6.5'),          
-     
     left:0
    
   },
@@ -849,10 +1016,10 @@ const styles = StyleSheet.create({
     padding: 30,
     marginVertical: 10,
     borderRadius: 3,
-    width: wp('70%'), 
+    width: wp('90%'), 
     height: hp('15%'), 
     overflow: 'visible', 
-    right:-60,
+    right:-20,
   },
   threadContainerModal: {
     justifyContent:"center",
@@ -872,17 +1039,17 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 2,
     width: wp('85%'), 
-    height: hp('15%'), 
+    height: hp('28%'), 
     overflow: 'visible', 
   },
   
   textDiscussHeader: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: wp('5'),
     marginBottom: 5,
   },
   textDiscussContent: {
-    fontSize: 12,
+    fontSize: 15,
     color: 'black',
   },
 });
