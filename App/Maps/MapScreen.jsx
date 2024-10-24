@@ -1,12 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View } from 'react-native';
 import MapStyle from '../../assets/util/MapStyle.json';
 import { UserLocationContext } from './UserLocationContext';
 import Markers from './Markers';
+import CustomMarker from './CustomMarker';
 
-export default function MapScreen({ placeList, onMarkerPress }) {
+export default function MapScreen({ placeList, onMarkerPress, specialMarkerLocation, specialMarkerImageUrl }) {
   const { location } = useContext(UserLocationContext);
+
+  useEffect(() => {
+    console.log('Special Marker Location:', specialMarkerLocation);
+    console.log('Special Marker Image URL:', specialMarkerImageUrl);
+  }, [specialMarkerLocation, specialMarkerImageUrl]);
 
   return location?.latitude && (
     <View style={styles.container}>
@@ -26,10 +32,24 @@ export default function MapScreen({ placeList, onMarkerPress }) {
               latitude: location.latitude,
               longitude: location.longitude,
             }}
+            image={require('../../assets/images/markUser.png')} // User location marker image
           />
         )}
+
+        {specialMarkerLocation && specialMarkerImageUrl && (
+          <Marker
+            coordinate={{
+              latitude: specialMarkerLocation.latitude,
+              longitude: specialMarkerLocation.longitude,
+            }}
+          // Use the CustomMarker component to render the special marker image
+          >
+            <CustomMarker imageUrl={specialMarkerImageUrl} />
+          </Marker>
+        )}
+
         {placeList && placeList.map((item, index) => (
-          <Markers key={index} place={item} onMarkerPress={onMarkerPress} /> 
+          <Markers key={index} place={item} onMarkerPress={onMarkerPress} />
         ))}
       </MapView>
     </View>
